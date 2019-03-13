@@ -27,4 +27,4 @@ int main(){
     g.pintar();
 
     return 0;
-}
+
