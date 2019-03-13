@@ -3,6 +3,7 @@
 #include <fstream>
 #include "Graficas.h"
 
+
 using namespace std;
 
 int main(){
