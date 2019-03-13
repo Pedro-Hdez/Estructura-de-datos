@@ -1,6 +1,4 @@
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
+
 #include "Graficas.h"
 
 
@@ -27,4 +25,4 @@ int main(){
     g.pintar();
 
     return 0;
-
+}
