@@ -495,8 +495,265 @@ void lista_nodos::terminar(){
 
 /********************************************************************************************************************************************************************************************/
 
+struct caja3{
+    caja2 *direccionNodo;
+    float rutaCorta;
+    caja3 *siguiente, *antes;
+};
+
+/********************************************************************************************************************************************************************************************/
+
+class lista{
+     private:
+        caja3 *anterior, *principio, *fin;
+        int encontrado;
+        int donde;
+        enum encontrado{SI, NO};
+        enum donde{PRINCIPIO, ENMEDIO, FINAL};
+
+    public:
+        lista();
+        void iniciar();
+        ~lista();
+        void terminar();
+        void buscar(float a);
+        int agregar(caja2 *q, float a);
+        caja2 * sacar();
+        int borrar(float a);
+        void pintar();
+        void ajustar (caja3 *p, float a);
+};
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+lista::lista(){
+    anterior = principio = fin = NULL;
+    encontrado = NO;
+    donde = VACIO;
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void lista::iniciar(){
+    anterior = principio = fin = NULL;
+    encontrado = NO;
+    donde = VACIO;
+}
+
+void lista::buscar(float a){
+    caja3 *p; //Puntero tipo caja3 que recorrerá la estructura.
+
+    //Si la estructura está vacía entonces se indica que el dato no se encontró y que la lista está vacia.
+    if(principio == NULL){
+        encontrado = NO;
+        donde = VACIO;
+        return;
+    }
+
+    //Si la lista no está vacía, entonces se comenzará a recorrer desde el principio hasta el final.
+    p = principio;
+    while(p){
+
+        //Si se encuentra el dato, entonces la variable encontrado toma el valor de SI.
+        if(p -> rutaCorta == a){
+            encontrado = SI;
+            if(p == principio){ //Si se encuentra al principio, entonces donde = PRINCIPIO.
+                donde = PRINCIPIO;
+            }else if(p -> siguiente == NULL){ //Si la siguiente dirección es NULL, entonces significa que estamos en el final de la lista.
+                donde = FINAL;
+             }
+             else{ //Si no estamos al principio ni al final de la lista ordenada, entonces encontramos el número enmedio de la estructura.
+                donde = ENMEDIO;
+            }
+            return;
+        }
+        /*
+        Como estamos ordenando números de menor a mayor, entonces si encontramos algún número menor a 'a', simplemente seguimos recorriendo
+        la estructura.
+        */
+        else if(p -> rutaCorta < a){
+            encontrado = NO; //Se indica que no se ha encontrado aún.
+            anterior = p; //El puntero '*anterior' toma el valor de la dirección en donde nos encontramos.
+            p = p -> siguiente; //Finalmente p se pone sobre la siguiente caja de la lista ordenada.
+        }
+        /*
+        Como estamos ordenando números de menor a mayor, entonces, si encontramos algún número mayor a 'a', significa que nuestro nuevo
+        valor debe agregarse una posición antes de este número mayor con el que nos encontramos.
+        */
+        else{
+            encontrado = NO; //Se indica que 'a' no ha sido encontrado.
+            if(principio == p){ //Si el primer elemento que checamos resultó ser mayor, entonces significa que 'a' debe agregarse al principio.
+                donde = PRINCIPIO;
+            }
+            else{ //Si no lo encontramos al principio, entonces forzosamente debe de agregarse en algún lugar enmedio de la estructura.
+                donde = ENMEDIO;
+            }
+            return;
+        }
+    }
+    /*
+    Si el ciclo se acaba y se recorre toda la lista sin encontrar ningún número mayor, entonces significa que el número que queremos
+    encontrar es mayor a todos los que existen dentro de la lista ordenada; por lo tanto, no ha sido encontrado y debe agregarse al final.
+    */
+    encontrado = NO;
+    donde = FINAL;
+    return;
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+int lista::agregar(caja2 *q, float a){
+    caja3 *p; //Puntero tipo caja3 donde guardaremos el valor a agregar.
+    buscar(a); //Se busca 'a'.
+
+    p = new caja3; //Se crea una nueva caja3.
+    p -> direccionNodo = q;//Se introduce el valor de 'a' a la caja.
+    p -> rutaCorta = a;
+    /*
+    Si la lista está vacía, entonces los dos punteros de la caja son NULL (porque no existe nada antes ni después de éste elemento).
+    Este primer elemento también representará el principio y el fin de la lista, por eso principio = fin  = p.
+    */
+
+    if(donde == VACIO){
+        p -> siguiente = NULL;
+        p -> antes = NULL;
+        principio = p;
+        fin = p;
+    }
+    /*
+    Si se debe agregar al principio, entonces '*siguiente' de la caja que agregaremos apuntará al elemento que antes era el principio;
+    el '*anterior' de la cajita a agregar será NULL (No habrá elemnto antes que el primero de la lista). Se conecta el puntero '*anterior'
+    del siguiente dato con la cajita que hemos agregado. El puntero '*principio' toma también el valor de p.
+    */
+    else if(donde == PRINCIPIO){
+        p -> siguiente = principio;
+        p -> antes = NULL;
+        ( p -> siguiente ) -> antes = p;
+        principio = p;
+    }
+    /*
+    Si se debe agregar al final, entonces '*siguiente' de la caja que agregaremos debe ser NULL (no existe ningún elemento después del último).
+    '*antes' de la caja que agregaremos deberá apuntar al que antes era el último elemento de la lista (*fin). Se conecta el puntero '*siguiente'
+    de la caja que antes era la última con la nueva caja. El puntero '*fin' toma el valor de p.
+    */
+    else if(donde == FINAL){
+        p -> siguiente = NULL;
+        p -> antes = fin;
+        (p -> antes) -> siguiente = p;
+        fin = p;
+    }
+    /*
+    Si se agrega enmedio de la lista, entonces se puentean los punteros usando la dirección '*anterior'
+    */
+    else{
+        p -> siguiente = anterior -> siguiente;
+        p -> antes = anterior;
+        (p -> siguiente) -> antes = p;
+        anterior -> siguiente = p;
+    }
+    return(1);
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+caja2 *lista::sacar(){
+    caja3 *p;
+    caja2 *q;
+
+    p = principio;
+    q = p->direccionNodo;
+    principio = p -> siguiente;
+    if (p -> siguiente == NULL) fin = NULL;
+    else (p -> siguiente) -> antes = NULL;
+
+    delete(p);
+    return(q);
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+int lista::borrar(float a){
+    caja3 *p;
+    buscar(a);
+    if(encontrado == NO) return(0);
+
+    if(donde == PRINCIPIO){
+        p = principio;
+        principio = p -> siguiente;
+        if (p -> siguiente == NULL) fin = NULL;
+        else (p -> siguiente) -> antes = NULL;
+    }
+    else if(donde == ENMEDIO){
+        p = anterior -> siguiente;
+        anterior -> siguiente = p -> siguiente;
+        (p -> siguiente) -> antes = anterior;
+    }
+    else{
+        p = fin;
+        (p -> antes) -> siguiente = NULL;
+        fin = anterior;
+    }
+    delete(p);
+    return(1);
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+void lista::ajustar(caja3 *p, float a){
+    if(p -> rutaCorta <= a) return;
+
+    caja2 *q; float ruta;
+    q = p->direccionNodo;
+    ruta = p->rutaCorta;
+
+    borrar(a);
+    agregar(q, ruta);
+
+    return;
+
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+void lista::pintar(){
+    caja3 *p;
+    p = fin;
+
+    while(p){
+        std::cout << p -> direccionNodo << "Longitud: " << p->rutaCorta << " , ";
+        p = p -> antes;
+    }
+    std::cout << "\b\b ";
+
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+lista::~lista(){
+    caja3 *p;
+    while(principio){
+        p = principio;
+        principio = p -> siguiente;
+        delete p;
+    }
+    anterior = principio = fin = NULL;
+    encontrado = NO;
+    donde = VACIO;
+
+    return;
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+void lista::terminar(){
+    caja3 *p;
+    while(principio){
+        p = principio;
+        principio = p -> siguiente;
+        delete p;
+    }
+    anterior = principio = fin = NULL;
+    encontrado = NO;
+    donde = VACIO;
+
+    return;
+}
+
+
+/********************************************************************************************************************************************************************************************/
 class grafica{
     lista_nodos A;
+    lista B;
 public:
     grafica();
     ~grafica();
@@ -507,6 +764,7 @@ public:
 
 grafica::grafica(){
     A.iniciar();
+    B.iniciar();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -535,6 +793,7 @@ void grafica::pintar(){
 
 grafica::~grafica(){
     A.terminar();
+    B.terminar();
 }
 
 
