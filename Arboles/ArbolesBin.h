@@ -24,7 +24,8 @@ public:
     void buscar (int a);
     int agregar(int a);
     void pintar();
-    int borrar1(int a);
+    int borrar(int a);
+    void borrar1(nodo *p1);
 
 };
 //------------------------------------------------------------------------------------------------------------------------------------//
@@ -172,98 +173,111 @@ void arbol::pintar(){
     std::string padre = "";
     std::string hizq = "";
     std::string hder = "";
+    std::string valor = "";
     nodo *p;
     p = principio;
     while(p){
-
+        ( raiz == NULL ? valor = "Arbol vacío" : valor = to_string(p->valor));
         (p->padre == NULL ?   padre = "null" : padre = to_string(p->padre->valor) );
         (p->hizq == NULL ?   hizq = "null" : hizq = to_string(p->hizq->valor) );
         (p->hder == NULL ?   hder = "null" : hder = to_string(p->hder->valor) );
 
-        cout << "NODO: " << p->valor << endl << "PADRE: " << padre << endl
+        cout << "NODO: " << valor << endl << "PADRE: " << padre << endl
              << "HIJO IZQU: " << hizq << endl << "HIJO DER: " << hder << endl << endl;
         p = p->siguiente;
     }
 }
 
-int arbol::borrar1(int a){
+int arbol::borrar(int a){
+    nodo *p;
     buscar(a);
 
-    if(encontrado == NO) return (0);
+    if(encontrado == NO) return(0);
 
-    nodo *p;
-    if(como == HIZQ) p = donde->hizq;
-    else p = donde->hder;
-
-    //CASO DE BORRAR UN NODO SIN HIJOS
-    if(p->hizq == NULL && p->hder == NULL){
-        //Se desconecta del padre haciendo Null su respectiva rama
-        if(como == RAIZ){
-            delete p;
-            raiz = principio = fin = NULL;
-            return(1);
-        }
-        else{
-            if(como == HIZQ) donde->hizq = NULL;
-            else donde -> hder = NULL;
-
-            if(p == principio){
-                principio = p->siguiente;
-                (p->siguiente)->anterior = NULL;
-            }
-            else if(p == fin){
-                fin = p->anterior;
-                (p->anterior)->siguiente = NULL;
-
-            }
-            else{
-                (p->anterior)->siguiente = p->siguiente;
-                (p->siguiente)->anterior = p->anterior;
-            }
-            delete p;
-        }
+    if(como == RAIZ){
+        p = raiz;
     }
-    //CASO DE BORRAR NODOS CON UN SOLO HIJO
+    else if(como == HDER){
+        p = donde->hder;
+    }
     else{
-        //EL NODO SE DESCONECTA DEL ARBOL
-        if(como == HIZQ){
-            if(p->hizq == NULL){
-                (p->padre)->hizq = p->hder;
-                (p->hder)->padre = p->padre;
-            }
-            else{
-                (p->padre)->hizq = p->hizq;
-                (p->hizq)->padre = p->padre;
-            }
+        p = donde->hizq;
+    }
+
+    //PENDIENTE
+
+    borrar1(p);
+
+    if(p == principio){
+        if(principio == fin){
+            principio = fin = NULL;
         }
         else{
-            if(p->hizq == NULL){
-                (p->padre)->hder = p->hder;
-                (p->hder)->padre = p->padre;
-            }
-            else{
-                (p->padre)->hder = p->hizq;
-                (p->hizq)->padre = p->padre;
-            }
-
-        }
-        //SE AJUSTA LA LISTA ORDENADA
-        if(p == principio){
             principio = p->siguiente;
             (p->siguiente)->anterior = NULL;
         }
-        else if(p == fin){
-            fin = p->anterior;
-            (p->anterior)->siguiente = NULL;
 
-        }
-        else{
-            (p->anterior)->siguiente = p->siguiente;
-            (p->siguiente)->anterior = p->anterior;
-        }
-        delete p;
     }
+    else if(p == fin){
+        fin = p->anterior;
+        (p->anterior)->siguiente = NULL;
+
+    }
+    else{
+        (p->anterior)->siguiente = p->siguiente;
+        (p->siguiente)->anterior = p->anterior;
+    }
+    delete p;
+
+    return(1);
 }
 
+void arbol::borrar1(nodo *p1){
+    nodo *p = p1;
 
+    if(p->hder == NULL && p->hizq == NULL){ //CASO DE NODO SIN HIJOS
+        //¿Caso de ser raiz?
+        if(como == RAIZ){
+            raiz = NULL;
+        }
+
+        //SE VERIFICA SI CUELGA COMO HIJO IZQUIERDO O DERECHO
+        else if(como == HDER){
+            donde->hder = NULL;
+        }
+        else{
+            donde->hizq = NULL;
+        }
+    }
+    else if(p->hder != NULL){
+        //¿Checamos caso raiz?
+        if(como == RAIZ){
+            raiz = (p->hder);
+            (p->hder)->padre = NULL;
+        }
+        else if(como == HDER){
+            (donde->hder) = (p->hder);
+            (p->hder)->padre = donde;
+        }
+        else{
+            (donde->hizq)=p->hder;
+            (p->hder)->padre = donde;
+        }
+    }
+    else{
+        //¿Checamos caso raiz?
+        if(como == RAIZ){
+            raiz = (p->hizq);
+            (p->hizq)->padre = NULL;
+        }
+        else if(como == HDER){
+            (donde->hder) = p->hizq;
+            (p->hizq)->padre = donde;
+        }
+        else{
+            (donde->hizq) = p->hizq;
+            (p->hizq)->padre = donde;
+        }
+    }
+}
 #endif // ARBOLESBIN_H_INCLUDED
