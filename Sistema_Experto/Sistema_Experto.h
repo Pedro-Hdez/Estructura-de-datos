@@ -215,7 +215,7 @@ caja1 *lista_arcos::Principio(){
 void lista_arcos::pintar(){
     caja1 *p; p = principio; //Se crea un puntero tipo caja y se sitúa al principio de la lista ordenada.
     while(p){ //Se imprimen todos los valores que forman parte de la estructura.
-        cout << "Nodo: " << p -> numNodo << " ; Cambio: " << p->cambiaValor << endl;
+        cout << "Nodo: " << p->direccionNodo->numNodo << " ; Cambio: " << p->cambiaValor << endl;
         p = p -> siguiente;
     }
     cout << "\b\b ";
@@ -358,7 +358,7 @@ void lista_nodos::buscar(int a){
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
-int lista_nodos::agregar(int nodo[8]){
+int lista_nodos::agregar(int nodo[7]){
     caja2 *p; //Puntero tipo caja que nos servirá para agregar el valor a la estructura.
     buscar( nodo[0] ); //Se busca el número que queremos introducir.
 
@@ -441,7 +441,7 @@ class SE{
 public:
     SE();
     ~SE();
-    void agregar_arco(int nodo[8]);
+    void agregar_arco(int nodo1[7], int nodo2[7]);
     void pintar();
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -455,13 +455,17 @@ SE::~SE(){
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void SE::agregar_arco(int nodo[8]){
+void SE::agregar_arco(int nodo1[7], int nodo2[7]){
     caja1 *p;
     caja2 *q, *q2;
-    A.agregar(nodo);
+    A.agregar(nodo1);
     q = q2 = A.lugar_agregado();
-    (q -> salientes).agregar(nodo[6], nodo[7]);
+    (q -> salientes).agregar(nodo2[0], nodo2[6]);
     p = (q->salientes).lugar_agregado();
+
+    A.agregar(nodo2);
+    q = A.lugar_agregado();
+    (p -> direccionNodo) = q;
 
 }
 
