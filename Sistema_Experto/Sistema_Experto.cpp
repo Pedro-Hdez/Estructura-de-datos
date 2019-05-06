@@ -11,13 +11,14 @@ int main(){
 
     SE a;
 
-   int nodo[14];
+    int nodo[14];
     int nodo1[7], nodo2[7];
+    string preguntas_conclusiones[40];
     ifstream sist;
 
 
     int componente;
-    sist.open("preguntas_conclusiones.txt");
+    sist.open("nodos.txt");
     if (!sist){
         cout << "Error en la apertura del archivo...\n\n";
         system("pause");
@@ -25,7 +26,6 @@ int main(){
     }
 
     int i = 0;
-    int j = 0;
     string texto;
     while(sist){
         if(i < 13){
@@ -46,10 +46,28 @@ int main(){
             a.agregar_arco(nodo1, nodo2);
             i = 0;
         }
-
     }
 
     a.pintar();
+
+    ifstream sist2;
+    sist2.open("preguntas.txt");
+    if (!sist2){
+        cout << "Error en la apertura del archivo...\n\n";
+        system("pause");
+        return 1;
+    }
+
+    i = 1;
+    while(sist2){
+        sist2 >> preguntas_conclusiones[i];
+        i++;
+    }
+    cout << endl << endl << "PREGUNTAS, CONCLUSIONES, CLÁUSULAS INTERMEDIAS" << endl;
+    for(int k = 1 ; k < 40 ; k++){
+        cout << k << ": " << preguntas_conclusiones[k] << endl;
+    }
+    a.correr(preguntas_conclusiones);
 
     return 0;
 

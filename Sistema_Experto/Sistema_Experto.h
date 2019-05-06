@@ -3,6 +3,7 @@
 
 #define VACIO 99999
 #include <iostream>
+#include <string>
 
 using namespace::std;
 
@@ -443,6 +444,7 @@ public:
     ~SE();
     void agregar_arco(int nodo1[7], int nodo2[7]);
     void pintar();
+    void correr(string preguntas[40]);
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -474,4 +476,52 @@ void SE::pintar(){
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+void SE::correr(string preguntas[40]){
+ caja2 *dir; //Puntero que almacenará la dirección del nodo pregunta en el que estamos
+ caja1 *saliente; // Puntero que recorrerá a los salientes de un nodo pregunta
+ int pregunta = 1; //Dirección de los textos de las preguntas.
+ int respuesta; //Respuesta del usuario
+ int respSaliente; //Respuesta que se enviará a todos los salientes de las preguntas
+
+ //La función se detendrá hasta haber recorrido todo el arreglo de preguntas
+ while(pregunta != 40){
+    A.buscar(pregunta); //Se busca una pregunta
+    dir = A.lugar_agregado(); //Se guarda su dirección
+
+    //Si la pregunta no tiene valor de verdad, entonces se hace.
+    if(dir->valorVerdad == -1){
+        cout << pregunta << ": " << preguntas[pregunta] << endl;
+        cin >> respuesta;
+    }
+    //La pregunta actual toma el valor que el usuario le dio
+    dir->valorVerdad = respuesta;
+
+    //El puntero 'saliente' se posiciona en el primer saliente de este nodo pregunta para recorrerlos todos.
+    saliente = dir->salientes.Principio();
+
+    //Se recorren todos los salientes de la pregunta
+    while(saliente){
+            cout << "PROCESO LOS SALIENTES" << endl;
+        //Se decide el valor a enviar de acuerdo a la variable cambiaValor de los salientes
+        if(saliente->cambiaValor == 0) respSaliente = respuesta;
+        else{
+            if(respuesta == 1) respSaliente = 0;
+            else respSaliente = 1;
+        }
+
+        if(saliente->direccionNodo->conectivo == 1){
+            if(respSaliente == 0) saliente->direccionNodo->valorVerdad = 0;
+            else saliente->direccionNodo->cuantos++;
+        }
+        else if(saliente->direccionNodo->conectivo == 0){
+            if(respSaliente == 0) saliente->direccionNodo->cuantos++;
+            else saliente->direccionNodo->valorVerdad = 1;
+        }
+        saliente = saliente->siguiente;
+    }
+    pregunta = 40;
+ }
+ pintar();
+
+}
 #endif // SISTEMA_EXPERTO_H_INCLUDED
