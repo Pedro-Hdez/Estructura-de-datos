@@ -48,8 +48,6 @@ int main(){
         }
     }
 
-    a.pintar();
-
     ifstream sist2;
     sist2.open("preguntas.txt");
     if (!sist2){
@@ -62,10 +60,6 @@ int main(){
     while(sist2){
         sist2 >> preguntas_conclusiones[i];
         i++;
-    }
-    cout << endl << endl << "PREGUNTAS, CONCLUSIONES, CLÁUSULAS INTERMEDIAS" << endl;
-    for(int k = 1 ; k < 40 ; k++){
-        cout << k << ": " << preguntas_conclusiones[k] << endl;
     }
     a.correr(preguntas_conclusiones);
 

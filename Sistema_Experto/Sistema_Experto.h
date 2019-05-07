@@ -226,10 +226,6 @@ void lista_arcos::pintar(){
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
-struct caja3{
-    caja2 *direccion;
-};
-
 /**************************************************************************************************************************************************************************************************/
 
 class lista_nodos{
@@ -436,8 +432,144 @@ caja2* lista_nodos::lugar_agregado(){
 }
 /**************************************************************************************************************************************************************************************************/
 
+struct caja3{
+    caja2 *direccion;
+    caja3 *siguiente;
+};
+
+class pila{
+    //ATRIBUTOS
+    private:
+        caja3 *principio; //puntero que apunta al principio de la pila.
+    //MÉTODOS
+    public:
+        pila(); //Constructor de la clase.
+        void iniciar();
+        ~pila();//Destructor de la clase.
+        void terminar();
+        void Agregar(caja2 *saliente); //Método para agregar elementos a la pila.
+        caja2 * Sacar(); //Método para sacar elementos de la pila.
+        void Pintar(); //Método para imprimir la pila.
+};
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*
+    Este método es el constructor de la clase pila. Inicializa el puntero 'principio' como NULL porque no
+    existe ningún elemento dentro de la pila; por este mismo motivo la variable 'cuantos' toma el valor de cero.
+*/
+pila::pila(){
+    principio = NULL;
+}
+void pila::iniciar(){
+    principio = NULL;
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+/*
+    Esta función agrega el número 'a' a la pila.
+*/
+void pila::Agregar(caja2 *saliente){
+    caja3 *p; //Puntero tipo caja.
+    p = new caja3;
+    p->direccion = saliente; //Se crea una nueva caja.
+
+    /*
+    Si no existe ningun elemento en la pila, entonces el dato
+    en cuestión se introduce al princiío de ésta; como será el
+    único elemento, el apuntador '*siguiente' de esta caja será NULL.
+    */
+    if(principio == NULL){
+        p -> siguiente = NULL;
+        principio = p;
+    }
+    /*
+    Si ya existe algún elemento en la pila, entonce el nuevo dato se introduce
+    antes que el que ya estaba, de esta manera queda "arriba" de él; con lo que
+    el nuevo elemento toma el lugar del principio de la cola(cima).
+    */
+    else{
+        p -> siguiente = principio;
+        principio = p;
+    }
+    return;
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Esta función se encarga de sacar el último elemento de la pila, muestra su valor y libera la memoria ocupada por éste.
+caja2 * pila::Sacar(){
+    caja3 *p;
+    caja2 *direccion;
+
+    //Si no hay nada en la píla, entonces se regresa el valor VACIO.
+    if(principio == NULL){
+        return(NULL);
+    }
+    /*
+    Si existe algún elemento en la pila, entonces el puntero '*p' se coloca sobre este (que se encuentra en la cima) y, como será eliminado,
+    entonces el siguiente elemento se convierte en el primero de la estructura.
+    */
+    else{
+        direccion = principio->direccion;
+        p = principio;
+        principio = p -> siguiente;
+    }
+    delete p; //Se libera la memoria ocupada por el dato en cuestión.
+    return (direccion); //Se regresa eel valor que el dato extraído tenía.
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+/*
+Esta función imprime en pantalla los datos que están en la pila.
+*/
+void pila::Pintar(){
+    caja3 *p; p = principio; //Se crea un puntero a caja y se posiciona al principio de la pila.
+    //Mientras p no sea NULL (mientras no recorra todas las cajitas) se imprime su contenido.
+    while(p){
+        std::cout << p->direccion->numNodo << " " << endl;
+        p = p -> siguiente;
+    }
+    std::cout << "\b\b ";
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+/*
+El destructor de la pila libera la memoria que ocupan los datos que están en la estructura
+y reinician los atributos de la pila.
+*/
+pila:: ~pila(){
+    caja3 *p;//Puntero a caja
+    /*
+    Mientras el puntero principio no sea NULL, el puntero p se posiciona sobre el principio, el
+    principio se recorre un espacio y se libera la memoria ocupada por p.
+    */
+
+    while(principio){
+        p = principio;
+        principio = p -> siguiente;
+        delete p;
+    }
+    //Se reinician las variables.
+    principio = NULL;
+    return;
+}
+
+void pila::terminar(){
+    caja3 *p;//Puntero a caja
+    /*
+    Mientras el puntero principio no sea NULL, el puntero p se posiciona sobre el principio, el
+    principio se recorre un espacio y se libera la memoria ocupada por p.
+    */
+
+    while(principio){
+        p = principio;
+        principio = p -> siguiente;
+        delete p;
+    }
+    //Se reinician las variables.
+    principio = NULL;
+    return;
+}
+/****************************************************************************************************************************************************/
 class SE{
     lista_nodos A;
+    pila B;
 
 public:
     SE();
@@ -478,16 +610,18 @@ void SE::pintar(){
 
 void SE::correr(string preguntas[40]){
  caja2 *dir; //Puntero que almacenará la dirección del nodo pregunta en el que estamos
- caja1 *saliente; // Puntero que recorrerá a los salientes de un nodo pregunta
+ caja1 *saliente, *salientePila;
+ caja2 *pila; // Puntero que recorrerá a los salientes de un nodo pregunta
  int pregunta = 1; //Dirección de los textos de las preguntas.
  int respuesta; //Respuesta del usuario
- int respSaliente; //Respuesta que se enviará a todos los salientes de las preguntas
+ int respSaliente, respSaliente2; //Respuesta que se enviará a todos los salientes de las preguntas
 
  //La función se detendrá hasta haber recorrido todo el arreglo de preguntas
  while(pregunta != 40){
     A.buscar(pregunta); //Se busca una pregunta
+    cout << "Busqué la pregunta" << endl;
     dir = A.lugar_agregado(); //Se guarda su dirección
-
+    cout << "Guarde la direccion de la pregunta" << endl;
     //Si la pregunta no tiene valor de verdad, entonces se hace.
     if(dir->valorVerdad == -1){
         cout << pregunta << ": " << preguntas[pregunta] << endl;
@@ -495,6 +629,7 @@ void SE::correr(string preguntas[40]){
     }
     //La pregunta actual toma el valor que el usuario le dio
     dir->valorVerdad = respuesta;
+    cout << "Guarde la respuesta a la pregunta" << endl;
 
     //El puntero 'saliente' se posiciona en el primer saliente de este nodo pregunta para recorrerlos todos.
     saliente = dir->salientes.Principio();
@@ -509,19 +644,102 @@ void SE::correr(string preguntas[40]){
             else respSaliente = 1;
         }
 
+        /*
+        Se decide si el 'valorVerdad' se hace cero o 'Cuantos' se incrementa
+        De acuerdo al valor de verdad recibido y al tipo de conectivo del saliente;
+        además se checa si el saliente adquiere un valor de verdad para introducirlo
+        a la pila y "desparramar" ese valor a donde se debe.
+        */
         if(saliente->direccionNodo->conectivo == 1){
-            if(respSaliente == 0) saliente->direccionNodo->valorVerdad = 0;
+            if(respSaliente == 0){
+                saliente->direccionNodo->valorVerdad = 0;
+                B.Agregar(saliente->direccionNodo);
+            }
             else saliente->direccionNodo->cuantos++;
+
+            if(saliente->direccionNodo->cuantos == saliente->direccionNodo->totales){
+                saliente->direccionNodo->valorVerdad = 1;
+                B.Agregar(saliente->direccionNodo);
+            }
+
         }
         else if(saliente->direccionNodo->conectivo == 0){
             if(respSaliente == 0) saliente->direccionNodo->cuantos++;
-            else saliente->direccionNodo->valorVerdad = 1;
+            else{
+                saliente->direccionNodo->valorVerdad = 1;
+                B.Agregar(saliente->direccionNodo);
+            }
+
+            if(saliente->direccionNodo->cuantos == saliente->direccionNodo->totales){
+                saliente->direccionNodo->valorVerdad = 0;
+                B.Agregar(saliente->direccionNodo);
+            }
+        }
+
+        //SE PROCESA LA PILA DE LOS NODOS QUE YA ADQUIRIERON VALOR
+        cout << "PILA ANTES DE PROCESARLA: " << endl;
+        B.Pintar();
+        cout << "PINTÉ LA PILA!" << endl;
+        cout << endl <<endl;
+
+        pila = B.Sacar();
+       // cout << "Primer valor de la pila: " << pila->numNodo << endl << "Con valor: " << pila->valorVerdad << endl;
+        while(pila){
+            salientePila = pila->salientes.Principio();
+            respSaliente = pila->valorVerdad;
+
+            while(salientePila){
+                if(salientePila->cambiaValor == 0) respSaliente = pila->valorVerdad;
+                else{
+                    if(pila->valorVerdad == 1) respSaliente = 0;
+                    else respSaliente = 1;
+                }
+
+                if(salientePila->direccionNodo->conectivo == 1){
+                    if(respSaliente == 0){
+                        if(salientePila->direccionNodo->valorVerdad != 0){
+                            salientePila->direccionNodo->valorVerdad = 0;
+                            B.Agregar(salientePila->direccionNodo);
+                        }
+
+                    }
+                    else salientePila->direccionNodo->cuantos++;
+
+                    if(salientePila->direccionNodo->cuantos == salientePila->direccionNodo->totales){
+                        if(salientePila->direccionNodo->valorVerdad != 1){
+                            salientePila->direccionNodo->valorVerdad = 1;
+                            B.Agregar(salientePila->direccionNodo);
+                        }
+
+                    }
+                }
+                else if(salientePila->direccionNodo->conectivo == 0){
+                    if(respSaliente == 0) salientePila->direccionNodo->cuantos++;
+                    else{
+                        if(salientePila->direccionNodo->valorVerdad != 1){
+                            salientePila->direccionNodo->valorVerdad = 1;
+                            B.Agregar(salientePila->direccionNodo);
+                        }
+                    }
+
+                    if(salientePila->direccionNodo->cuantos == salientePila->direccionNodo->totales){
+                        if(salientePila->direccionNodo->valorVerdad != 0){
+                            salientePila->direccionNodo->valorVerdad = 0;
+                            B.Agregar(salientePila->direccionNodo);
+                        }
+                    }
+                }
+                salientePila = salientePila->siguiente;
+            }
+            pila = B.Sacar();
         }
         saliente = saliente->siguiente;
+
     }
-    pregunta = 40;
+    pregunta++;
+    pintar();
  }
- pintar();
+
 
 }
 #endif // SISTEMA_EXPERTO_H_INCLUDED
