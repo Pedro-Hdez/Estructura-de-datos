@@ -20,6 +20,7 @@ struct caja1{
 class lista_arcos{
     caja1 *principio, *anterior, *lugarAgregado;
     int encontrado, donde;
+    int cuantos;
     enum encontrado{SI, NO};
     enum donde{PRINCIPIO, ENMEDIO, FINAL};
 
@@ -33,6 +34,7 @@ public:
     void buscar(int a);
     int agregar(int numNodo, int cambiaValor);
     void pintar();
+    int Cuantos();
     caja1 *lugar_agregado();
     caja1 *Principio();
 };
@@ -53,6 +55,7 @@ lista_arcos::lista_arcos(){
     principio = anterior = lugarAgregado = NULL;
     encontrado = NO;
     donde = VACIO;
+    cuantos = 0;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
@@ -60,6 +63,7 @@ void lista_arcos::iniciar(){
     principio = anterior = lugarAgregado = NULL;
     encontrado = NO;
     donde = VACIO;
+    cuantos = 0;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
@@ -73,6 +77,7 @@ lista_arcos::~lista_arcos(){
     principio = anterior = lugarAgregado = NULL;
     encontrado = NO;
     donde = VACIO;
+    cuantos = 0;
     return;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
@@ -87,9 +92,21 @@ void lista_arcos::terminar(){
     principio = anterior = lugarAgregado = NULL;
     encontrado = NO;
     donde = VACIO;
+    cuantos = 0;
     return;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+
+int lista_arcos::Cuantos(){
+    caja1 *p;
+    p = principio;
+    while(p){
+        cuantos++;
+        p = p->siguiente;
+
+    }
+    return(cuantos);
+}
 
 void lista_arcos::buscar(int a){
     caja1 *p; //Puntero tipo caja que recorrerá la estructura.
@@ -570,6 +587,7 @@ void pila::terminar(){
 class SE{
     lista_nodos A;
     pila B;
+    int solucion;
 
 public:
     SE();
@@ -582,10 +600,14 @@ public:
 
 SE::SE(){
     A.iniciar();
+    B.iniciar();
+    solucion = 0;
 }
 
 SE::~SE(){
     A.terminar();
+    B.terminar();
+    solucion = 0;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -614,131 +636,202 @@ void SE::correr(string preguntas[40]){
  caja2 *pila; // Puntero que recorrerá a los salientes de un nodo pregunta
  int pregunta = 1; //Dirección de los textos de las preguntas.
  int respuesta; //Respuesta del usuario
- int respSaliente, respSaliente2; //Respuesta que se enviará a todos los salientes de las preguntas
+ int respSaliente; //Respuesta que se enviará a todos los salientes de las preguntas
+ int conclusion;
+ int redundante = 0;
+ int indice = 1;
+
+ caja2 *conc1,*conc2,*conc3,*conc4,*conc5,*conc6,*conc7;
+ A.buscar(21);
+ conc1 = A.lugar_agregado();
+ A.buscar(22);
+ conc2 = A.lugar_agregado();
+ A.buscar(23);
+ conc3 = A.lugar_agregado();
+ A.buscar(24);
+ conc4 = A.lugar_agregado();
+ A.buscar(25);
+ conc5 = A.lugar_agregado();
+ A.buscar(26);
+ conc6 = A.lugar_agregado();
+ A.buscar(27);
+ conc7 = A.lugar_agregado();
 
  //La función se detendrá hasta haber recorrido todo el arreglo de preguntas
  while(pregunta != 40){
+    if(conc1->valorVerdad == 0 && conc2->valorVerdad == 0 && conc3->valorVerdad == 0 &&
+       conc4->valorVerdad == 0 && conc5->valorVerdad == 0 && conc6->valorVerdad == 0 &&
+       conc7->valorVerdad == 0){
+        cout << "NO PUEDO ADIVINAR EL ANIMAL EN EL QUE ESTAS PENSANDO. SORRY" << endl << endl;
+        return;
+    }
+
     A.buscar(pregunta); //Se busca una pregunta
-    cout << "Busqué la pregunta" << endl;
     dir = A.lugar_agregado(); //Se guarda su dirección
-    cout << "Guarde la direccion de la pregunta" << endl;
-    //Si la pregunta no tiene valor de verdad, entonces se hace.
-    if(dir->valorVerdad == -1){
-        cout << pregunta << ": " << preguntas[pregunta] << endl;
-        cin >> respuesta;
-    }
-    //La pregunta actual toma el valor que el usuario le dio
-    dir->valorVerdad = respuesta;
-    cout << "Guarde la respuesta a la pregunta" << endl;
 
-    //El puntero 'saliente' se posiciona en el primer saliente de este nodo pregunta para recorrerlos todos.
     saliente = dir->salientes.Principio();
-
-    //Se recorren todos los salientes de la pregunta
+    redundante = 0;
     while(saliente){
-            cout << "PROCESO LOS SALIENTES" << endl;
-        //Se decide el valor a enviar de acuerdo a la variable cambiaValor de los salientes
-        if(saliente->cambiaValor == 0) respSaliente = respuesta;
-        else{
-            if(respuesta == 1) respSaliente = 0;
-            else respSaliente = 1;
-        }
-
-        /*
-        Se decide si el 'valorVerdad' se hace cero o 'Cuantos' se incrementa
-        De acuerdo al valor de verdad recibido y al tipo de conectivo del saliente;
-        además se checa si el saliente adquiere un valor de verdad para introducirlo
-        a la pila y "desparramar" ese valor a donde se debe.
-        */
-        if(saliente->direccionNodo->conectivo == 1){
-            if(respSaliente == 0){
-                saliente->direccionNodo->valorVerdad = 0;
-                B.Agregar(saliente->direccionNodo);
-            }
-            else saliente->direccionNodo->cuantos++;
-
-            if(saliente->direccionNodo->cuantos == saliente->direccionNodo->totales){
-                saliente->direccionNodo->valorVerdad = 1;
-                B.Agregar(saliente->direccionNodo);
-            }
-
-        }
-        else if(saliente->direccionNodo->conectivo == 0){
-            if(respSaliente == 0) saliente->direccionNodo->cuantos++;
-            else{
-                saliente->direccionNodo->valorVerdad = 1;
-                B.Agregar(saliente->direccionNodo);
-            }
-
-            if(saliente->direccionNodo->cuantos == saliente->direccionNodo->totales){
-                saliente->direccionNodo->valorVerdad = 0;
-                B.Agregar(saliente->direccionNodo);
-            }
-        }
-
-        //SE PROCESA LA PILA DE LOS NODOS QUE YA ADQUIRIERON VALOR
-        cout << "PILA ANTES DE PROCESARLA: " << endl;
-        B.Pintar();
-        cout << "PINTÉ LA PILA!" << endl;
-        cout << endl <<endl;
-
-        pila = B.Sacar();
-       // cout << "Primer valor de la pila: " << pila->numNodo << endl << "Con valor: " << pila->valorVerdad << endl;
-        while(pila){
-            salientePila = pila->salientes.Principio();
-            respSaliente = pila->valorVerdad;
-
-            while(salientePila){
-                if(salientePila->cambiaValor == 0) respSaliente = pila->valorVerdad;
-                else{
-                    if(pila->valorVerdad == 1) respSaliente = 0;
-                    else respSaliente = 1;
-                }
-
-                if(salientePila->direccionNodo->conectivo == 1){
-                    if(respSaliente == 0){
-                        if(salientePila->direccionNodo->valorVerdad != 0){
-                            salientePila->direccionNodo->valorVerdad = 0;
-                            B.Agregar(salientePila->direccionNodo);
-                        }
-
-                    }
-                    else salientePila->direccionNodo->cuantos++;
-
-                    if(salientePila->direccionNodo->cuantos == salientePila->direccionNodo->totales){
-                        if(salientePila->direccionNodo->valorVerdad != 1){
-                            salientePila->direccionNodo->valorVerdad = 1;
-                            B.Agregar(salientePila->direccionNodo);
-                        }
-
-                    }
-                }
-                else if(salientePila->direccionNodo->conectivo == 0){
-                    if(respSaliente == 0) salientePila->direccionNodo->cuantos++;
-                    else{
-                        if(salientePila->direccionNodo->valorVerdad != 1){
-                            salientePila->direccionNodo->valorVerdad = 1;
-                            B.Agregar(salientePila->direccionNodo);
-                        }
-                    }
-
-                    if(salientePila->direccionNodo->cuantos == salientePila->direccionNodo->totales){
-                        if(salientePila->direccionNodo->valorVerdad != 0){
-                            salientePila->direccionNodo->valorVerdad = 0;
-                            B.Agregar(salientePila->direccionNodo);
-                        }
-                    }
-                }
-                salientePila = salientePila->siguiente;
-            }
-            pila = B.Sacar();
-        }
+        if(saliente->direccionNodo->valorVerdad != -1) redundante++;
         saliente = saliente->siguiente;
-
     }
-    pregunta++;
-    pintar();
+    //Si la pregunta no tiene valor de verdad y no es redundante, entonces se hace.
+    if(dir->valorVerdad == -1 && (redundante != dir->salientes.Cuantos() || redundante == 0) ){
+        cout << indice++ << ": " << preguntas[pregunta] << endl;
+        cin >> respuesta;
+        //La pregunta actual toma el valor que el usuario le dio
+        dir->valorVerdad = respuesta;
+
+        //El puntero 'saliente' se posiciona en el primer saliente de este nodo pregunta para recorrerlos todos.
+        saliente = dir->salientes.Principio();
+
+        //Se recorren todos los salientes de la pregunta
+        while(saliente){
+            //Se decide el valor a enviar de acuerdo a la variable cambiaValor de los salientes
+            if(saliente->cambiaValor == 0) respSaliente = respuesta;
+            else{
+                if(respuesta == 1) respSaliente = 0;
+                else respSaliente = 1;
+            }
+
+            /*
+            Se decide si el 'valorVerdad' se hace cero o 'Cuantos' se incrementa
+            De acuerdo al valor de verdad recibido y al tipo de conectivo del saliente;
+            además se checa si el saliente adquiere un valor de verdad para introducirlo
+            a la pila y "desparramar" ese valor a donde se debe.
+            */
+            if(saliente->direccionNodo->conectivo == 1){
+                if(respSaliente == 0){
+                    saliente->direccionNodo->valorVerdad = 0;
+                    B.Agregar(saliente->direccionNodo);
+                }
+                else saliente->direccionNodo->cuantos++;
+
+                if(saliente->direccionNodo->cuantos == saliente->direccionNodo->totales){
+                    saliente->direccionNodo->valorVerdad = 1;
+                    B.Agregar(saliente->direccionNodo);
+                    if(saliente->direccionNodo->numNodo == 21 || saliente->direccionNodo->numNodo == 22 ||
+                       saliente->direccionNodo->numNodo == 23 || saliente->direccionNodo->numNodo == 24 ||
+                       saliente->direccionNodo->numNodo == 25 || saliente->direccionNodo->numNodo == 26 ||
+                       saliente->direccionNodo->numNodo == 27 ){
+                        solucion = 1;
+                        conclusion = saliente->direccionNodo->numNodo;
+                        pregunta = 40;
+                        break;
+                   }
+                }
+
+            }
+            else if(saliente->direccionNodo->conectivo == 0){
+                if(respSaliente == 0) saliente->direccionNodo->cuantos++;
+                else{
+                    saliente->direccionNodo->valorVerdad = 1;
+                    B.Agregar(saliente->direccionNodo);
+                    if(saliente->direccionNodo->numNodo == 21 || saliente->direccionNodo->numNodo == 22 ||
+                       saliente->direccionNodo->numNodo == 23 || saliente->direccionNodo->numNodo == 24 ||
+                       saliente->direccionNodo->numNodo == 25 || saliente->direccionNodo->numNodo == 26 ||
+                       saliente->direccionNodo->numNodo == 27 ){
+                        solucion = 1;
+                        conclusion = saliente->direccionNodo->numNodo;
+                        pregunta = 40;
+                        break;
+                   }
+                }
+
+                if(saliente->direccionNodo->cuantos == saliente->direccionNodo->totales){
+                    saliente->direccionNodo->valorVerdad = 0;
+                    B.Agregar(saliente->direccionNodo);
+                }
+            }
+
+            //SE PROCESA LA PILA DE LOS NODOS QUE YA ADQUIRIERON VALOR
+            pila = B.Sacar();
+            while(pila){
+                salientePila = pila->salientes.Principio();
+                respSaliente = pila->valorVerdad;
+
+                while(salientePila){
+                    if(salientePila->cambiaValor == 0) respSaliente = pila->valorVerdad;
+                    else{
+                        if(pila->valorVerdad == 1) respSaliente = 0;
+                        else respSaliente = 1;
+                    }
+
+                    if(salientePila->direccionNodo->conectivo == 1){
+                        if(respSaliente == 0){
+                            if(salientePila->direccionNodo->valorVerdad != 0){
+                                salientePila->direccionNodo->valorVerdad = 0;
+                                B.Agregar(salientePila->direccionNodo);
+                            }
+
+                        }
+                        else salientePila->direccionNodo->cuantos++;
+
+                        if(salientePila->direccionNodo->cuantos == salientePila->direccionNodo->totales){
+                            if(salientePila->direccionNodo->valorVerdad != 1){
+                                salientePila->direccionNodo->valorVerdad = 1;
+                                B.Agregar(salientePila->direccionNodo);
+                                if(salientePila->direccionNodo->numNodo == 21 || salientePila->direccionNodo->numNodo == 22 ||
+                                   salientePila->direccionNodo->numNodo == 23 || salientePila->direccionNodo->numNodo == 24 ||
+                                   salientePila->direccionNodo->numNodo == 25 || salientePila->direccionNodo->numNodo == 26 ||
+                                   salientePila->direccionNodo->numNodo == 27 ){
+                                    solucion = 1;
+                                    conclusion = salientePila->direccionNodo->numNodo;
+                                    pregunta = 40;
+                                    break;
+                               }
+                            }
+
+                        }
+                    }
+                    else if(salientePila->direccionNodo->conectivo == 0){
+                        if(respSaliente == 0) salientePila->direccionNodo->cuantos++;
+                        else{
+                            if(salientePila->direccionNodo->valorVerdad != 1){
+                                salientePila->direccionNodo->valorVerdad = 1;
+                                B.Agregar(salientePila->direccionNodo);
+                                if(salientePila->direccionNodo->numNodo == 21 || salientePila->direccionNodo->numNodo == 22 ||
+                                   salientePila->direccionNodo->numNodo == 23 || salientePila->direccionNodo->numNodo == 24 ||
+                                   salientePila->direccionNodo->numNodo == 25 || salientePila->direccionNodo->numNodo == 26 ||
+                                   salientePila->direccionNodo->numNodo == 27 ){
+                                    solucion = 1;
+                                    conclusion = salientePila->direccionNodo->numNodo;
+                                    pregunta = 40;
+                                    break;
+                               }
+                            }
+                        }
+
+                        if(salientePila->direccionNodo->cuantos == salientePila->direccionNodo->totales){
+                            if(salientePila->direccionNodo->valorVerdad != 0){
+                                salientePila->direccionNodo->valorVerdad = 0;
+                                B.Agregar(salientePila->direccionNodo);
+                            }
+                        }
+                    }
+                    salientePila = salientePila->siguiente;
+                }
+                pila = B.Sacar();
+            }
+            saliente = saliente->siguiente;
+
+        }
+        if(solucion == 1){
+            cout << preguntas[conclusion];
+            return;
+        }
+        pregunta++;
+    }
+    else pregunta++;
  }
+ cout << "NO PUDE ADIVINAR EL ANIMAL EN EL QUE ESTAS PENSANDO, PERO ESTA / ESTAS FUERON LAS OPCIONES MAS CERCANAS: " << endl;
+ if(conc1->valorVerdad == -1) cout << preguntas[21] << endl;
+ if(conc2->valorVerdad == -1) cout << preguntas[22] << endl;
+ if(conc3->valorVerdad == -1) cout << preguntas[23] << endl;
+ if(conc4->valorVerdad == -1) cout << preguntas[24] << endl;
+ if(conc5->valorVerdad == -1) cout << preguntas[25] << endl;
+ if(conc6->valorVerdad == -1) cout << preguntas[26] << endl;
+ if(conc7->valorVerdad == -1) cout << preguntas[27] << endl;
 
 
 }
