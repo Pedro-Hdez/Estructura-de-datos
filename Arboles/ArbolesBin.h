@@ -27,6 +27,7 @@ public:
     void pintar();
     int borrar(int a);
     void borrar1(nodo *p1);
+    void intercambiar(nodo *p, nodo *q);
 
 };
 //------------------------------------------------------------------------------------------------------------------------------------//
@@ -222,6 +223,43 @@ void arbol::pintar(){
         p = p->siguiente;
     }
 }
+//-------------------------------------------------------------------------------------------------------------------------------------------
+
+void arbol::intercambiar(nodo *p, nodo *q){
+    nodo *r
+
+    //Caso en el que p está arriba
+    if(q->padre == p){
+        if(p->hder == q){
+
+            //caso general
+            r = p->padre;
+            p->padre = q->padre;
+            q->padre = r;
+
+            r = p->hder;
+            p->hder = q->hder;
+            q->hder = r;
+
+            r = p->hizq;
+            p->hizq = q->hizq;
+            q->hizq = r;
+
+            if(q->padre == NULL) raiz = q;
+            else{
+                if(q->padre->hder == p) q->padre->hder = q;
+                else q->padre->hizq = q;
+            }
+
+            if(p->padre == NULL) raiz = p;
+            else{
+                if(p->padre->hder == q) p->padre->hder = p;
+                else p->padre->hizq = p;
+            }
+            //caso general
+        }
+    }
+}
 
 int arbol::borrar(int a){
     nodo *p;
@@ -243,33 +281,13 @@ int arbol::borrar(int a){
 
     borrar1(p);
 
-    if(p == principio){
-        if(principio == fin){
-            principio = fin = NULL;
-        }
-        else{
-            principio = p->siguiente;
-            (p->siguiente)->anterior = NULL;
-        }
-
-    }
-    else if(p == fin){
-        fin = p->anterior;
-        (p->anterior)->siguiente = NULL;
-
-    }
-    else{
-        (p->anterior)->siguiente = p->siguiente;
-        (p->siguiente)->anterior = p->anterior;
-    }
-    delete p;
-
     return(1);
 }
 
 void arbol::borrar1(nodo *p1){
     nodo *p = p1;
 
+    //EL NODO SE DESCONECTA DEL ÁRBOL
     if(p->hder == NULL && p->hizq == NULL){ //CASO DE NODO SIN HIJOS
         //¿Caso de ser raiz?
         if(como == RAIZ){
@@ -314,5 +332,29 @@ void arbol::borrar1(nodo *p1){
             (p->hizq)->padre = donde;
         }
     }
+
+    //EL NODO SE DESCONECTA DE LA RAIZ
+    if(p == principio){
+        if(principio == fin){
+            principio = fin = NULL;
+        }
+        else{
+            principio = p->siguiente;
+            (p->siguiente)->anterior = NULL;
+        }
+
+    }
+    else if(p == fin){
+        fin = p->anterior;
+        (p->anterior)->siguiente = NULL;
+
+    }
+    else{
+        (p->anterior)->siguiente = p->siguiente;
+        (p->siguiente)->anterior = p->anterior;
+    }
+
+    //Se borra el nodo
+    delete p;
 }
 #endif // ARBOLESBIN_H_INCLUDED
