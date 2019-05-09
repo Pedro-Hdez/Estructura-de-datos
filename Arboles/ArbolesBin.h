@@ -3,8 +3,9 @@
 
 #include <iostream>
 #include <string>
-
+#include <sstream>
 using namespace std;
+//ptueb
 
 struct nodo{
     nodo *padre, *hder, *hizq, *anterior, *siguiente;
@@ -174,13 +175,47 @@ void arbol::pintar(){
     std::string hizq = "";
     std::string hder = "";
     std::string valor = "";
+    stringstream ss;
     nodo *p;
     p = principio;
+
+
     while(p){
-        ( raiz == NULL ? valor = "Arbol vacío" : valor = to_string(p->valor));
-        (p->padre == NULL ?   padre = "null" : padre = to_string(p->padre->valor) );
-        (p->hizq == NULL ?   hizq = "null" : hizq = to_string(p->hizq->valor) );
-        (p->hder == NULL ?   hder = "null" : hder = to_string(p->hder->valor) );
+        if(raiz == NULL){
+        valor = "Arbol vacío";
+        }
+        else{
+            ss << p->valor;
+            valor = ss.str();
+        }
+        ss.str("");
+
+        if(p->padre == NULL){
+            padre = "null";
+        }
+        else{
+            ss << p->padre->valor;
+            padre = ss.str();
+        }
+        ss.str("");
+
+        if(p->hizq == NULL){
+            hizq = "null";
+        }
+        else{
+            ss << p->hizq->valor;
+            hizq = ss.str();
+        }
+        ss.str("");
+
+        if(p->hder == NULL){
+            hder = "null";
+        }
+        else{
+            ss << p->hder->valor;
+            hder = ss.str();
+        }
+        ss.str("");
 
         cout << "NODO: " << valor << endl << "PADRE: " << padre << endl
              << "HIJO IZQU: " << hizq << endl << "HIJO DER: " << hder << endl << endl;

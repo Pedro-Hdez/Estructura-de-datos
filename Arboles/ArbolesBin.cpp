@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <fstream>
 
+
 #include "ArbolesBin.h"
 
 using namespace std;
