@@ -632,16 +632,18 @@ void SE::pintar(){
 
 void SE::correr(string preguntas[40]){
  caja2 *dir; //Puntero que almacenará la dirección del nodo pregunta en el que estamos
- caja1 *saliente, *salientePila;
- caja2 *pila; // Puntero que recorrerá a los salientes de un nodo pregunta
+ caja1 *saliente, *salientePila; //Punteros que recorrerán los salientes de los nodos pregunta y los nodos de la lista.
+ caja2 *pila; // Puntero que recorrerá la pila de nodos con valor de verdad.
  int pregunta = 1; //Dirección de los textos de las preguntas.
  int respuesta; //Respuesta del usuario
  int respSaliente; //Respuesta que se enviará a todos los salientes de las preguntas
- int conclusion;
- int redundante = 0;
- int indice = 1;
+ int conclusion; //Número de nodo que corresponde a la conclusión del sistema experto
+ int redundante = 0; //Contador que cuenta los salientes de una pregunta que ya tienen valor de verdad.
+ int indice = 1; //Índice de las preguntas que se van haciendo (Estilo).
 
- caja2 *conc1,*conc2,*conc3,*conc4,*conc5,*conc6,*conc7;
+ caja2 *conc1,*conc2,*conc3,*conc4,*conc5,*conc6,*conc7; //Punteros a las conclusiones.
+
+ //SE BUSCAN Y SE GUARDAN EN UN PUNTERO LAS DIRECCIONES DE LAS CONCLUSIONES DEL SISTEMA EXPERTO
  A.buscar(21);
  conc1 = A.lugar_agregado();
  A.buscar(22);
@@ -657,8 +659,11 @@ void SE::correr(string preguntas[40]){
  A.buscar(27);
  conc7 = A.lugar_agregado();
 
+ //COMIENZA LA EJECUCIÓN DEL SISTEMA EXPERTO
+
  //La función se detendrá hasta haber recorrido todo el arreglo de preguntas
  while(pregunta != 40){
+    //Amtes de comenzar se verifica que por lo menos una conclusión sea plausible para seguir con el proceso.
     if(conc1->valorVerdad == 0 && conc2->valorVerdad == 0 && conc3->valorVerdad == 0 &&
        conc4->valorVerdad == 0 && conc5->valorVerdad == 0 && conc6->valorVerdad == 0 &&
        conc7->valorVerdad == 0){
@@ -666,164 +671,208 @@ void SE::correr(string preguntas[40]){
         return;
     }
 
-    A.buscar(pregunta); //Se busca una pregunta
+    A.buscar(pregunta); //Se busca la pregunta
     dir = A.lugar_agregado(); //Se guarda su dirección
 
+    /*
+        Se coloca un puntero en los salientes de la pregunta para recorrerlos y contar
+        cuántos ya tienen valor de verdad. Si la suma de los salientes con valor de verdad
+        es igual al número total de salientes, entonces la pregunta es redundante y se omite
+    */
     saliente = dir->salientes.Principio();
     redundante = 0;
     while(saliente){
         if(saliente->direccionNodo->valorVerdad != -1) redundante++;
         saliente = saliente->siguiente;
     }
+
     //Si la pregunta no tiene valor de verdad y no es redundante, entonces se hace.
-    if(dir->valorVerdad == -1 && (redundante != dir->salientes.Cuantos() || redundante == 0) ){
+    if(dir->valorVerdad == -1 && (redundante != dir->salientes.Cuantos() || redundante == 0) &&
+        dir->numNodo <= 20){
         cout << indice++ << ": " << preguntas[pregunta] << endl;
         cin >> respuesta;
-        //La pregunta actual toma el valor que el usuario le dio
-        dir->valorVerdad = respuesta;
 
-        //El puntero 'saliente' se posiciona en el primer saliente de este nodo pregunta para recorrerlos todos.
-        saliente = dir->salientes.Principio();
-
-        //Se recorren todos los salientes de la pregunta
-        while(saliente){
-            //Se decide el valor a enviar de acuerdo a la variable cambiaValor de los salientes
-            if(saliente->cambiaValor == 0) respSaliente = respuesta;
-            else{
-                if(respuesta == 1) respSaliente = 0;
-                else respSaliente = 1;
-            }
+        //Si la respuesta es diferente de "NO SÉ", entonces se comienzan a distribuir todos los valores, si no, se salta.
+        if(respuesta != 2){
+            //La pregunta actual toma el valor que el usuario le dio
+            dir->valorVerdad = respuesta;
 
             /*
-            Se decide si el 'valorVerdad' se hace cero o 'Cuantos' se incrementa
-            De acuerdo al valor de verdad recibido y al tipo de conectivo del saliente;
-            además se checa si el saliente adquiere un valor de verdad para introducirlo
-            a la pila y "desparramar" ese valor a donde se debe.
+                El puntero 'saliente' se posiciona en el primer saliente de este nodo pregunta para recorrerlos todos
+                y distribuir la respuesta que el usuario dió.
             */
-            if(saliente->direccionNodo->conectivo == 1){
-                if(respSaliente == 0){
-                    saliente->direccionNodo->valorVerdad = 0;
-                    B.Agregar(saliente->direccionNodo);
-                }
-                else saliente->direccionNodo->cuantos++;
+            saliente = dir->salientes.Principio();
 
-                if(saliente->direccionNodo->cuantos == saliente->direccionNodo->totales){
-                    saliente->direccionNodo->valorVerdad = 1;
-                    B.Agregar(saliente->direccionNodo);
-                    if(saliente->direccionNodo->numNodo == 21 || saliente->direccionNodo->numNodo == 22 ||
-                       saliente->direccionNodo->numNodo == 23 || saliente->direccionNodo->numNodo == 24 ||
-                       saliente->direccionNodo->numNodo == 25 || saliente->direccionNodo->numNodo == 26 ||
-                       saliente->direccionNodo->numNodo == 27 ){
-                        solucion = 1;
-                        conclusion = saliente->direccionNodo->numNodo;
-                        pregunta = 40;
-                        break;
-                   }
+            //Se recorren todos los salientes de la pregunta
+            while(saliente){
+                //Se decide el valor a enviar de acuerdo a la variable cambiaValor de los salientes
+                if(saliente->cambiaValor == 0) respSaliente = respuesta; //Si no se cambia valor, entonces se deja igual
+                else{ //Si hay que cambiar de valor, entonces la respuesta que el usuario dio se niega.
+                    if(respuesta == 1) respSaliente = 0;
+                    else respSaliente = 1;
                 }
 
-            }
-            else if(saliente->direccionNodo->conectivo == 0){
-                if(respSaliente == 0) saliente->direccionNodo->cuantos++;
-                else{
-                    saliente->direccionNodo->valorVerdad = 1;
-                    B.Agregar(saliente->direccionNodo);
-                    if(saliente->direccionNodo->numNodo == 21 || saliente->direccionNodo->numNodo == 22 ||
-                       saliente->direccionNodo->numNodo == 23 || saliente->direccionNodo->numNodo == 24 ||
-                       saliente->direccionNodo->numNodo == 25 || saliente->direccionNodo->numNodo == 26 ||
-                       saliente->direccionNodo->numNodo == 27 ){
-                        solucion = 1;
-                        conclusion = saliente->direccionNodo->numNodo;
-                        pregunta = 40;
-                        break;
-                   }
+                /*
+                Se decide si el 'valorVerdad' se hace cero o 'Cuantos' se incrementa
+                De acuerdo al valor de verdad recibido y al tipo de conectivo del saliente;
+                además se checa si el saliente adquiere un valor de verdad para introducirlo
+                a la pila y "desparramar" ese valor a donde se debe.
+                */
+
+                //CONECTIVO 'Y'
+                if(saliente->direccionNodo->conectivo == 1){
+                    //Si recibe un 0, entonce automáticamente se hace falso y como el nodo tomo valor de verdad, entonces se agrega a la pila
+                    if(respSaliente == 0){
+                        saliente->direccionNodo->valorVerdad = 0;
+                        B.Agregar(saliente->direccionNodo);
+                    }
+                    else saliente->direccionNodo->cuantos++; //Si se recibe un uno, entonces la variable cuantos se ve incrementada en una unidad.
+
+                    /*
+                        Como es conectivo 'Y', cuando la variable 'cuantos' = 'totales', el nodo toma el valor de verdadero, si este nodo
+                        es una conclusión, entonces el sistema experto termina de ejecutarse.
+                    */
+                    if(saliente->direccionNodo->cuantos == saliente->direccionNodo->totales){
+                        saliente->direccionNodo->valorVerdad = 1; //Se hace verdadero el valor de verdad del nodo.
+                        B.Agregar(saliente->direccionNodo); //Como acaba de tomar valor de verdad, entonces se agrega a la pila
+                        //Si el nodo que adquirió valor de verdad = 1 es una conclusión, entonces termina la ejecución.
+                        if(saliente->direccionNodo->numNodo == 21 || saliente->direccionNodo->numNodo == 22 ||
+                           saliente->direccionNodo->numNodo == 23 || saliente->direccionNodo->numNodo == 24 ||
+                           saliente->direccionNodo->numNodo == 25 || saliente->direccionNodo->numNodo == 26 ||
+                           saliente->direccionNodo->numNodo == 27 ){
+                            solucion = 1;
+                            conclusion = saliente->direccionNodo->numNodo; //Se guarda la conclusión.
+                            pregunta = 40;
+                            break;
+                       }
+                    }
+
                 }
-
-                if(saliente->direccionNodo->cuantos == saliente->direccionNodo->totales){
-                    saliente->direccionNodo->valorVerdad = 0;
-                    B.Agregar(saliente->direccionNodo);
-                }
-            }
-
-            //SE PROCESA LA PILA DE LOS NODOS QUE YA ADQUIRIERON VALOR
-            pila = B.Sacar();
-            while(pila){
-                salientePila = pila->salientes.Principio();
-                respSaliente = pila->valorVerdad;
-
-                while(salientePila){
-                    if(salientePila->cambiaValor == 0) respSaliente = pila->valorVerdad;
+                // CONECTIVO 'O'
+                else if(saliente->direccionNodo->conectivo == 0){
+                    //Si recibe un 0, entonces la variable cuantos se ve incrementada en una unidad.
+                    if(respSaliente == 0) saliente->direccionNodo->cuantos++;
                     else{
-                        if(pila->valorVerdad == 1) respSaliente = 0;
-                        else respSaliente = 1;
+                        //Si recibe un 1, entonce automáticamente se hace verdadero y como el nodo tomó valor de verdad, entonces se agrega a la pila
+                        saliente->direccionNodo->valorVerdad = 1;
+                        B.Agregar(saliente->direccionNodo);
+
+                        //Si el nodo que adquirió valor de verdad = 1 es una conclusión, entonces termina la ejecución.
+                        if(saliente->direccionNodo->numNodo == 21 || saliente->direccionNodo->numNodo == 22 ||
+                           saliente->direccionNodo->numNodo == 23 || saliente->direccionNodo->numNodo == 24 ||
+                           saliente->direccionNodo->numNodo == 25 || saliente->direccionNodo->numNodo == 26 ||
+                           saliente->direccionNodo->numNodo == 27 ){
+                            solucion = 1;
+                            conclusion = saliente->direccionNodo->numNodo; //Se guarda la conclusión.
+                            pregunta = 40;
+                            break;
+                       }
                     }
 
-                    if(salientePila->direccionNodo->conectivo == 1){
-                        if(respSaliente == 0){
-                            if(salientePila->direccionNodo->valorVerdad != 0){
-                                salientePila->direccionNodo->valorVerdad = 0;
-                                B.Agregar(salientePila->direccionNodo);
-                            }
+                    /*
+                        Como es conectivo 'O', cuando la variable 'cuantos' = 'totales', el nodo toma el valor de falso y se agrega a la pila.
+                    */
 
-                        }
-                        else salientePila->direccionNodo->cuantos++;
-
-                        if(salientePila->direccionNodo->cuantos == salientePila->direccionNodo->totales){
-                            if(salientePila->direccionNodo->valorVerdad != 1){
-                                salientePila->direccionNodo->valorVerdad = 1;
-                                B.Agregar(salientePila->direccionNodo);
-                                if(salientePila->direccionNodo->numNodo == 21 || salientePila->direccionNodo->numNodo == 22 ||
-                                   salientePila->direccionNodo->numNodo == 23 || salientePila->direccionNodo->numNodo == 24 ||
-                                   salientePila->direccionNodo->numNodo == 25 || salientePila->direccionNodo->numNodo == 26 ||
-                                   salientePila->direccionNodo->numNodo == 27 ){
-                                    solucion = 1;
-                                    conclusion = salientePila->direccionNodo->numNodo;
-                                    pregunta = 40;
-                                    break;
-                               }
-                            }
-
-                        }
+                    if(saliente->direccionNodo->cuantos == saliente->direccionNodo->totales){
+                        saliente->direccionNodo->valorVerdad = 0;
+                        B.Agregar(saliente->direccionNodo);
                     }
-                    else if(salientePila->direccionNodo->conectivo == 0){
-                        if(respSaliente == 0) salientePila->direccionNodo->cuantos++;
-                        else{
-                            if(salientePila->direccionNodo->valorVerdad != 1){
-                                salientePila->direccionNodo->valorVerdad = 1;
-                                B.Agregar(salientePila->direccionNodo);
-                                if(salientePila->direccionNodo->numNodo == 21 || salientePila->direccionNodo->numNodo == 22 ||
-                                   salientePila->direccionNodo->numNodo == 23 || salientePila->direccionNodo->numNodo == 24 ||
-                                   salientePila->direccionNodo->numNodo == 25 || salientePila->direccionNodo->numNodo == 26 ||
-                                   salientePila->direccionNodo->numNodo == 27 ){
-                                    solucion = 1;
-                                    conclusion = salientePila->direccionNodo->numNodo;
-                                    pregunta = 40;
-                                    break;
-                               }
-                            }
-                        }
-
-                        if(salientePila->direccionNodo->cuantos == salientePila->direccionNodo->totales){
-                            if(salientePila->direccionNodo->valorVerdad != 0){
-                                salientePila->direccionNodo->valorVerdad = 0;
-                                B.Agregar(salientePila->direccionNodo);
-                            }
-                        }
-                    }
-                    salientePila = salientePila->siguiente;
                 }
-                pila = B.Sacar();
-            }
-            saliente = saliente->siguiente;
 
+                /*
+                  En todo el bloque anterior tal vez algunos nodos entraron a la pila (adquirieron valor de verdad), entonces
+                  se deben procesar para distribuir los valores de éstos hacia donde corresponda y, en su defecto, seguir agregando
+                  más elementos.
+                */
+                pila = B.Sacar(); //El apuntador pila toma el valor del primer elemento de la pila (si está vacía, entonces no se hará nada)
+                while(pila){
+                    salientePila = pila->salientes.Principio(); //Se procesarán todos los salientes del nodo.
+                    respSaliente = pila->valorVerdad; //El valor de verdad que se enviará a la pila será el valor de verdad del nodo en cuestión.
+
+                    /*
+                        En este ciclo se barren todos los salientes del nodo en cuestión y el valor de verdad de éste se distribuye
+                    */
+                    while(salientePila){
+                        //Se decide si se cambia el valor o se mantiene, de acuerdo al conectivo del saliente.
+                        if(salientePila->cambiaValor == 0) respSaliente = pila->valorVerdad;
+                        else{
+                            if(pila->valorVerdad == 1) respSaliente = 0;
+                            else respSaliente = 1;
+                        }
+
+                        //Se decide qué hacer en caso de que el saliente tenga conectivo 'Y'
+                        if(salientePila->direccionNodo->conectivo == 1){
+                            if(respSaliente == 0){
+                                if(salientePila->direccionNodo->valorVerdad != 0){
+                                    salientePila->direccionNodo->valorVerdad = 0;
+                                    B.Agregar(salientePila->direccionNodo);
+                                }
+
+                            }
+                            else salientePila->direccionNodo->cuantos++;
+
+                            if(salientePila->direccionNodo->cuantos == salientePila->direccionNodo->totales){
+                                if(salientePila->direccionNodo->valorVerdad != 1){
+                                    salientePila->direccionNodo->valorVerdad = 1;
+                                    B.Agregar(salientePila->direccionNodo);
+                                    if(salientePila->direccionNodo->numNodo == 21 || salientePila->direccionNodo->numNodo == 22 ||
+                                       salientePila->direccionNodo->numNodo == 23 || salientePila->direccionNodo->numNodo == 24 ||
+                                       salientePila->direccionNodo->numNodo == 25 || salientePila->direccionNodo->numNodo == 26 ||
+                                       salientePila->direccionNodo->numNodo == 27 ){
+                                        solucion = 1;
+                                        conclusion = salientePila->direccionNodo->numNodo;
+                                        pregunta = 40;
+                                        break;
+                                   }
+                                }
+
+                            }
+                        }
+                        //Se decide qué hacer en caso de que el saliente tenga conectivo 'O'
+                        else if(salientePila->direccionNodo->conectivo == 0){
+                            if(respSaliente == 0) salientePila->direccionNodo->cuantos++;
+                            else{
+                                if(salientePila->direccionNodo->valorVerdad != 1){
+                                    salientePila->direccionNodo->valorVerdad = 1;
+                                    B.Agregar(salientePila->direccionNodo);
+                                    if(salientePila->direccionNodo->numNodo == 21 || salientePila->direccionNodo->numNodo == 22 ||
+                                       salientePila->direccionNodo->numNodo == 23 || salientePila->direccionNodo->numNodo == 24 ||
+                                       salientePila->direccionNodo->numNodo == 25 || salientePila->direccionNodo->numNodo == 26 ||
+                                       salientePila->direccionNodo->numNodo == 27 ){
+                                        solucion = 1;
+                                        conclusion = salientePila->direccionNodo->numNodo;
+                                        pregunta = 40;
+                                        break;
+                                   }
+                                }
+                            }
+
+                            if(salientePila->direccionNodo->cuantos == salientePila->direccionNodo->totales){
+                                if(salientePila->direccionNodo->valorVerdad != 0){
+                                    salientePila->direccionNodo->valorVerdad = 0;
+                                    B.Agregar(salientePila->direccionNodo);
+                                }
+                            }
+                        }
+                        salientePila = salientePila->siguiente; //Se procesa el siguiente saliente del nodo de la pila
+                    }
+                    pila = B.Sacar(); //Se procesa el siguiente nodo en la pila
+                }
+                saliente = saliente->siguiente; //Se procesa el siguiente saliente de la pregunta.
+
+            }
+            //Si la solución tomó el valor de 1, entonces significa que el sistema llegó a una conclusión; se imprime y se termina el programa.
+            if(solucion == 1){
+                cout << preguntas[conclusion];
+                return;
+            }
         }
-        if(solucion == 1){
-            cout << preguntas[conclusion];
-            return;
-        }
-        pregunta++;
+        pregunta++; //Si la respuesta del usuario fue 2 (No sé), entonces esa pregunta se salta.
     }
-    else pregunta++;
+    else pregunta++; //Cuando ya se ha procesado completamente una pregunta, se procede a hacer la siguiente y procesarla.
  }
+
+ //En caso de que se termine el programa y no haya una conclusión, entonces se procede a imprimir las posibles opciones que el sistema experto tenía como respuesta
  cout << "NO PUDE ADIVINAR EL ANIMAL EN EL QUE ESTAS PENSANDO, PERO ESTA / ESTAS FUERON LAS OPCIONES MAS CERCANAS: " << endl;
  if(conc1->valorVerdad == -1) cout << preguntas[21] << endl;
  if(conc2->valorVerdad == -1) cout << preguntas[22] << endl;
@@ -832,7 +881,5 @@ void SE::correr(string preguntas[40]){
  if(conc5->valorVerdad == -1) cout << preguntas[25] << endl;
  if(conc6->valorVerdad == -1) cout << preguntas[26] << endl;
  if(conc7->valorVerdad == -1) cout << preguntas[27] << endl;
-
-
 }
 #endif // SISTEMA_EXPERTO_H_INCLUDED
