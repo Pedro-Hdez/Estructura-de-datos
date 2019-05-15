@@ -685,8 +685,13 @@ caja2 *lista::sacar(){
     p = principio;
     q = p->direccionNodo;
     principio = p -> siguiente;
-    if (p -> siguiente == NULL) fin = NULL;
-    else (p -> siguiente) -> antes = principio;
+
+    if (p -> siguiente == NULL){
+            fin = NULL;
+    }
+    else{
+        (p->siguiente)->antes = NULL;
+    }
 
     delete(p);
     return(q);
@@ -708,7 +713,7 @@ int lista::borrar(float a){
         p = principio;
         principio = p -> siguiente;
         if (p -> siguiente == NULL) fin = NULL;
-        else (p -> siguiente) -> antes = principio;
+        else (p -> siguiente) -> antes = NULL;
     }
     else if(donde == ENMEDIO){
         p = anterior -> siguiente;
@@ -729,7 +734,7 @@ void lista::ajustar(caja3 *p, float a){
     if(p -> longitud <= a) return;
 
     std::cout << "VOY A AJUSTAR EL NODO: " << p->direccionNodo->numNodo << "con la longitud " << p->longitud << std::endl;
-    caja2 *q; float ruta;
+    caja2 *q;
     q = p->direccionNodo;
 
     std::cout << "BORRE EL NODO: " << p->direccionNodo->numNodo << "con la longitud " << p->longitud << std::endl;
@@ -807,6 +812,7 @@ public:
 grafica::grafica(){
     A.iniciar();
     L.iniciar();
+    existeRuta = 0;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -832,7 +838,7 @@ void grafica::rutaCorta(int a, int b){
     caja2 *p;
     caja1 *q;
 
-    A.agregar(a);
+    A.buscar(a);
     p = A.lugar_agregado();
 
     while(p){
@@ -846,6 +852,7 @@ void grafica::rutaCorta(int a, int b){
                 L.agregar(p, p->rutaCorta);
                 p = p->antecesor;
             }
+            std::cout << "RUTA MAS CORTA: " << std::endl;
             L.pintar();
             return;
         }
@@ -882,11 +889,10 @@ void grafica::rutaCorta(int a, int b){
         }
         p = L.sacar();
     }
-    if(existeRuta == 1){
-        std::cout << "RUTA MAS CORTA: " << std::endl;
-        L.pintar();
+    if(existeRuta == 0){
+        std::cout << "No existe ruta mas corta." << std::endl;
     }
-    else std::cout << "No existe ruta mas corta." << std::endl;
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

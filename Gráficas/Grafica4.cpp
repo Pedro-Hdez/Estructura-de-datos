@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "Graficas_4.h"
+#include "Graficas4.h"
 
 using namespace std;
 

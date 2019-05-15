@@ -12,7 +12,25 @@ int main(){
     int nodo;
     ifstream arbol;
 
-    arbol.open("arbol.txt");
+    a.agregar(5);
+    a.agregar(10);
+    a.agregar(15);
+    a.agregar(3);
+    a.agregar(1);
+    a.agregar(4);
+    cout << "PIRMERA VEZ" << endl;
+    a.pintar();
+    cout << endl << "-------------------------------------------------------";
+    cout << endl << "BORRO EL 4" << endl;
+    a.borrar(4);
+    a.pintar();
+    cout << endl << "-------------------------------------------------------";
+    cout << endl << "BORRO EL 5" << endl;
+    a.borrar(5);
+    a.pintar();
+
+
+    /*arbol.open("arbol.txt");
     if (!arbol){
         cout << "Error en la apertura del archivo...\n\n";
         system("pause");
@@ -51,5 +69,5 @@ int main(){
     cout << endl << "------------------------------------------------------------------------" << endl;
     cout << endl << "BORRE EL NODO 27" << endl;
     a.borrar(27);
-    a.pintar();
+    a.pintar();*/
 }
