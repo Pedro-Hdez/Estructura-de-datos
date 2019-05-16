@@ -12,25 +12,7 @@ int main(){
     int nodo;
     ifstream arbol;
 
-    a.agregar(5);
-    a.agregar(10);
-    a.agregar(15);
-    a.agregar(3);
-    a.agregar(1);
-    a.agregar(4);
-    cout << "PIRMERA VEZ" << endl;
-    a.pintar();
-    cout << endl << "-------------------------------------------------------";
-    cout << endl << "BORRO EL 4" << endl;
-    a.borrar(4);
-    a.pintar();
-    cout << endl << "-------------------------------------------------------";
-    cout << endl << "BORRO EL 5" << endl;
-    a.borrar(5);
-    a.pintar();
-
-
-    /*arbol.open("arbol.txt");
+    arbol.open("arbol.txt");
     if (!arbol){
         cout << "Error en la apertura del archivo...\n\n";
         system("pause");
@@ -46,28 +28,26 @@ int main(){
     a.pintar();
     cout << "------------------------------------------------------------------------" << endl;
 
-    cout << "BORRE EL NODO 50" << endl;
-    a.borrar(50);
+    cout << "BORRE EL NODO 17" << endl;
+
+    a.borrar(17);
     a.pintar();
-    cout << endl << "------------------------------------------------------------------------" << endl;
-    cout << endl << "BORRE EL NODO 60" << endl;
-    a.borrar(60);
+    cout << "------------------------------------------------------------------------" << endl;
+
+     cout << "BORRE EL NODO 78" << endl;
+
+    a.borrar(78);
     a.pintar();
-    cout << endl << "------------------------------------------------------------------------" << endl;
-    cout << endl << "BORRE EL NODO 85 y 40" << endl;
-    a.borrar(85);
-    a.borrar(40);
+    cout << "------------------------------------------------------------------------" << endl;
+     cout << "BORRE EL NODO 83" << endl;
+
+    a.borrar(83);
     a.pintar();
-    cout << endl << "------------------------------------------------------------------------" << endl;
-    cout << endl << "BORRE EL NODO 9" << endl;
-    a.borrar(9);
+    cout << "------------------------------------------------------------------------" << endl;
+     cout << "BORRE EL NODO 10" << endl;
+
+    a.borrar(10);
     a.pintar();
-    cout << endl << "------------------------------------------------------------------------" << endl;
-    cout << endl << "BORRE EL NODO 49" << endl;
-    a.borrar(49);
-    a.pintar();
-    cout << endl << "------------------------------------------------------------------------" << endl;
-    cout << endl << "BORRE EL NODO 27" << endl;
-    a.borrar(27);
-    a.pintar();*/
+    cout << "------------------------------------------------------------------------" << endl;
+
 }

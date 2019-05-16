@@ -228,8 +228,63 @@ void arbol::pintar(){
 void arbol::intercambiar(nodo *p, nodo *q){
     nodo *r;
 
+    //Caso en el que q está arriba
+    if(p->padre == q){ //Caso en el que q está arriba
+        if(q->hder == p){ //p cuelga como hijo derecho
+            //Intercambias los padres
+            r = p->padre;
+            p->padre = q->padre;
+            q->padre = r;
+
+            //Intercambias los hijos derechos
+            r = p->hder;
+            p->hder = q->hder;
+            q->hder = r;
+
+            //Intercambias los hijos izquierdos
+            r = p->hizq;
+            p->hizq = q->hizq;
+            q->hizq = r;
+
+            p->hder = q;
+            q->padre = p;
+/*********************************************************************************************************/
+        }
+        else{ //p cuelga como hijo izquierdo
+            //Intercambias los padres
+            r = p->padre;
+            p->padre = q->padre;
+            q->padre = r;
+
+            //Intercambias los hijos derechos
+            r = p->hder;
+            p->hder = q->hder;
+            q->hder = r;
+
+            //Intercambias los hijos izquierdos
+            r = p->hizq;
+            p->hizq = q->hizq;
+            q->hizq = r;
+
+            p->hizq = q;
+            q->padre = p;
+        }
+
+        //Se conectan los padres
+        if(q->padre == NULL) raiz = q;
+        else{
+            if(q->padre->hder == q) q->padre->hder = q;
+            else q->padre->hizq = q;
+        }
+
+        if(p->padre == NULL) raiz = p;
+        else{
+            if(p->padre->hder == q) p->padre->hder = p;
+            else p->padre->hizq = p;
+        }
+    }
     //Caso en el que p está arriba
-    if(q->padre == p){
+    else if(q->padre == p){
         if(p->hder == q){ //q cuelga como hijo derecho
             //Intercambias los padres
             r = p->padre;
@@ -268,47 +323,20 @@ void arbol::intercambiar(nodo *p, nodo *q){
             q->hizq = p;
             p->padre = q;
         }
-    }
-    else if(p->padre == q){ //Caso en el que q está arriba
-        if(q->hder == p){ //p cuelga como hijo derecho
-            //Intercambias los padres
-            r = p->padre;
-            p->padre = q->padre;
-            q->padre = r;
-
-            //Intercambias los hijos derechos
-            r = p->hder;
-            p->hder = q->hder;
-            q->hder = r;
-
-            //Intercambias los hijos izquierdos
-            r = p->hizq;
-            p->hizq = q->hizq;
-            q->hizq = r;
-
-            p->hder = q;
-            q->padre = p;
+        //Se conectan los padres
+        if(q->padre == NULL) raiz = q;
+        else{
+            if(q->padre->hder == p) q->padre->hder = q;
+            else q->padre->hizq = q;
         }
-        else{ //p cuelga como hijo izquierdo
-            //Intercambias los padres
-            r = p->padre;
-            p->padre = q->padre;
-            q->padre = r;
 
-            //Intercambias los hijos derechos
-            r = p->hder;
-            p->hder = q->hder;
-            q->hder = r;
-
-            //Intercambias los hijos izquierdos
-            r = p->hizq;
-            p->hizq = q->hizq;
-            q->hizq = r;
-
-            p->hizq = q;
-            q->padre = p;
+        if(p->padre == NULL) raiz = p;
+        else{
+            if(p->padre->hder == p) p->padre->hder = p;
+            else p->padre->hizq = p;
         }
     }
+    //CASO GENERAL
     else{
         //Intercambias los padres
         r = p->padre;
@@ -324,12 +352,25 @@ void arbol::intercambiar(nodo *p, nodo *q){
         r = p->hizq;
         p->hizq = q->hizq;
         q->hizq = r;
+
+        //Se conectan los padres
+        if(q->padre == NULL) raiz = q;
+        else{
+            if(q->padre->hder == p) q->padre->hder = q; /********/ //DUDA!!!!!
+            else q->padre->hizq = q;
+        }
+
+        if(p->padre == NULL) raiz = p;
+        else{
+            if(p->padre->hder == q) p->padre->hder = p;
+            else p->padre->hizq = p;
+        }
     }
 
     //SE ARREGLAN LOS VECINOS
 
     //Se conectan los padres
-    if(q->padre == NULL) raiz = q;
+  /*  if(q->padre == NULL) raiz = q;
     else{
         if(q->padre->hder == p) q->padre->hder = q;
         else q->padre->hizq = q;
@@ -339,7 +380,7 @@ void arbol::intercambiar(nodo *p, nodo *q){
     else{
         if(p->padre->hder == q) p->padre->hder = p;
         else p->padre->hizq = p;
-    }
+    }*/
 
     //Se conectan los hijoz.
     if(q -> hizq != NULL) q->hizq->padre = q;
@@ -365,17 +406,30 @@ int arbol::borrar(int a){
         p = donde->hizq;
     }
 
+    //SI TIENE DOS HIJOS SE INVOCA A LA FUNCIÓN INTERCAMBIAR
     if(p->hder != NULL && p->hizq != NULL){
-        intercambiar(p, p->anterior);
+        //Si queremos borrar la raiz y no hay ningún número menor que ella, entonces lo intercambiamos por el siguiente
+        if(p->anterior == NULL){
+            intercambiar(p, p->siguiente);
+            //Se ajustan las variables 'como' y 'donde'
+            donde = p->padre;
+            if(p->padre->hizq == p) como = HIZQ;
+            else como = HDER;
+        }
+
+        else{
+            //Si sí existe algún anterior, entonces se intercambia por ese
+            intercambiar(p, p->anterior);
+            //Se ajustan las variables 'como' y 'donde'
+            donde = p->padre;
+            if(p->padre->hizq == p) como = HIZQ;
+            else como = HDER;
+        }
+
     }
 
-    //SE AJUSTAN LAS VARIABLES 'donde' Y 'como' PARA PODER IMPLEMENTAR EL BORRAR1
-    donde = p->padre;
-    if(p->padre->hizq == p) como = HIZQ;
-    else como = HDER;
-
+    //SE BORRA EL NODO CON BORRAR 1.
     borrar1(p);
-
     return(1);
 }
 
