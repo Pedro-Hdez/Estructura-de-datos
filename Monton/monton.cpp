@@ -11,22 +11,51 @@ int main(){
     int nodo;
     ifstream monton;
 
-   /* monton.open("monton.txt");
+
+
+    monton.open("monton.txt");
     if (!monton){
         cout << "Error en la apertura del archivo...\n\n";
         system("pause");
         return 1;
     }
 
-    while(monton){
+
+    while (!monton.eof())
+    {
         monton >> nodo;
         a.agregar(nodo);
     }
 
-    cout << "MONTON: " << endl;*/
+    cout << "MONTON ORIGINAL: "<< endl;
+    a.pintar();
+    cout << "----------------------------------------------" << endl;
+
+    /*cout << "MONTON: " << endl;
     a.agregar(20);
     a.agregar(50);
-    a.agregar(100);
+    a.agregar(100);*/
+    cout << endl << "VOY A SACAR" << endl;
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.sacar();
+    a.pintar();
 
     cout << "------------------------------------------------------------------------" << endl;
 }
