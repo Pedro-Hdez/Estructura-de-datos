@@ -29,7 +29,7 @@ int main(){
     g.pintar();
     cout << endl << "**********************************************************************************************" << endl;
     cout << "ALGORITMO DE DIJKSTRA" << endl;
-    g.rutaCorta(1, 6);
+    g.rutaCorta(1, 8);
 
     return 0;
 }

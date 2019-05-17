@@ -250,14 +250,12 @@ class lista_nodos{
     int encontrado, donde;
     enum encontrado {SI, NO};
     enum donde{PRINCIPIO, ENMEDIO, FINAL};
-    enum tipo{PREGUNTA, CONCLUSION, CLAUSULA};
-    enum conectivo{AND, OR};
 
 public:
     lista_nodos();
     ~lista_nodos();
     void buscar(int a);
-    int agregar(int nodo[8]);
+    int agregar(int nodo[7]);
     void pintar();
     void iniciar();
     void terminar();
@@ -632,12 +630,11 @@ void SE::pintar(){
 
 void SE::correr(string preguntas[40]){
  caja2 *dir; //Puntero que almacenará la dirección del nodo pregunta en el que estamos
- caja1 *saliente, *salientePila; //Punteros que recorrerán los salientes de los nodos pregunta y los nodos de la lista.
+ caja1 *saliente, *salientePila; //Punteros que recorrerán los salientes de los nodos pregunta y los nodos de la pila.
  caja2 *pila; // Puntero que recorrerá la pila de nodos con valor de verdad.
  int pregunta = 1; //Dirección de los textos de las preguntas.
  int respuesta; //Respuesta del usuario
  int respSaliente; //Respuesta que se enviará a todos los salientes de las preguntas
- int conclusion; //Número de nodo que corresponde a la conclusión del sistema experto
  int redundante = 0; //Contador que cuenta los salientes de una pregunta que ya tienen valor de verdad.
  int indice = 1; //Índice de las preguntas que se van haciendo (Estilo).
 
@@ -662,7 +659,7 @@ void SE::correr(string preguntas[40]){
  //COMIENZA LA EJECUCIÓN DEL SISTEMA EXPERTO
 
  //La función se detendrá hasta haber recorrido todo el arreglo de preguntas
- while(pregunta != 40){
+ while(solucion == 0 && pregunta <= 20){
     //Amtes de comenzar se verifica que por lo menos una conclusión sea plausible para seguir con el proceso.
     if(conc1->valorVerdad == 0 && conc2->valorVerdad == 0 && conc3->valorVerdad == 0 &&
        conc4->valorVerdad == 0 && conc5->valorVerdad == 0 && conc6->valorVerdad == 0 &&
@@ -740,13 +737,10 @@ void SE::correr(string preguntas[40]){
                            saliente->direccionNodo->numNodo == 23 || saliente->direccionNodo->numNodo == 24 ||
                            saliente->direccionNodo->numNodo == 25 || saliente->direccionNodo->numNodo == 26 ||
                            saliente->direccionNodo->numNodo == 27 ){
-                            solucion = 1;
-                            conclusion = saliente->direccionNodo->numNodo; //Se guarda la conclusión.
-                            pregunta = 40;
+                            solucion = saliente->direccionNodo->numNodo;
                             break;
                        }
                     }
-
                 }
                 // CONECTIVO 'O'
                 else if(saliente->direccionNodo->conectivo == 0){
@@ -762,9 +756,7 @@ void SE::correr(string preguntas[40]){
                            saliente->direccionNodo->numNodo == 23 || saliente->direccionNodo->numNodo == 24 ||
                            saliente->direccionNodo->numNodo == 25 || saliente->direccionNodo->numNodo == 26 ||
                            saliente->direccionNodo->numNodo == 27 ){
-                            solucion = 1;
-                            conclusion = saliente->direccionNodo->numNodo; //Se guarda la conclusión.
-                            pregunta = 40;
+                            solucion = saliente->direccionNodo->numNodo;
                             break;
                        }
                     }
@@ -803,6 +795,11 @@ void SE::correr(string preguntas[40]){
                         //Se decide qué hacer en caso de que el saliente tenga conectivo 'Y'
                         if(salientePila->direccionNodo->conectivo == 1){
                             if(respSaliente == 0){
+                                    /*
+                                        Cuando vamos a asignar valor de verdad a nodos desde la pila primero hay que checar que dicho nodo
+                                        no tenga valor de verdad. Esto en el caso de que con anterioridad ya haya adquirido un valor de verdad
+                                        en otra parte del código.
+                                    */
                                 if(salientePila->direccionNodo->valorVerdad != 0){
                                     salientePila->direccionNodo->valorVerdad = 0;
                                     B.Agregar(salientePila->direccionNodo);
@@ -819,9 +816,7 @@ void SE::correr(string preguntas[40]){
                                        salientePila->direccionNodo->numNodo == 23 || salientePila->direccionNodo->numNodo == 24 ||
                                        salientePila->direccionNodo->numNodo == 25 || salientePila->direccionNodo->numNodo == 26 ||
                                        salientePila->direccionNodo->numNodo == 27 ){
-                                        solucion = 1;
-                                        conclusion = salientePila->direccionNodo->numNodo;
-                                        pregunta = 40;
+                                        solucion = salientePila->direccionNodo->numNodo;
                                         break;
                                    }
                                 }
@@ -839,9 +834,7 @@ void SE::correr(string preguntas[40]){
                                        salientePila->direccionNodo->numNodo == 23 || salientePila->direccionNodo->numNodo == 24 ||
                                        salientePila->direccionNodo->numNodo == 25 || salientePila->direccionNodo->numNodo == 26 ||
                                        salientePila->direccionNodo->numNodo == 27 ){
-                                        solucion = 1;
-                                        conclusion = salientePila->direccionNodo->numNodo;
-                                        pregunta = 40;
+                                        solucion = salientePila->direccionNodo->numNodo;
                                         break;
                                    }
                                 }
@@ -859,11 +852,10 @@ void SE::correr(string preguntas[40]){
                     pila = B.Sacar(); //Se procesa el siguiente nodo en la pila
                 }
                 saliente = saliente->siguiente; //Se procesa el siguiente saliente de la pregunta.
-
             }
             //Si la solución tomó el valor de 1, entonces significa que el sistema llegó a una conclusión; se imprime y se termina el programa.
-            if(solucion == 1){
-                cout << preguntas[conclusion];
+            if(solucion != 0){
+                cout << preguntas[solucion];
                 return;
             }
         }
