@@ -29,33 +29,44 @@ int main(){
 
     cout << "MONTON ORIGINAL: "<< endl;
     a.pintar();
-    cout << "----------------------------------------------" << endl;
+    cout << "----------------------------------------------" << endl << endl;
 
-    /*cout << "MONTON: " << endl;
+    cout << "SE SACA EL NODO: " << a.sacar() << ": " <<endl;
+    a.pintar();
+    cout << "----------------------------------------------" << endl << endl;
+
+    cout << "SE SACA EL NODO: " << a.sacar() << ": " <<endl;
+    a.pintar();
+    cout << "----------------------------------------------" << endl << endl;
+
+    cout << "SE SACA EL NODO: " << a.sacar() << ": " <<endl;
+    a.pintar();
+    cout << "----------------------------------------------" << endl << endl;
+
+    cout << "SE METE EL NODO: 20" << ": " <<endl;
     a.agregar(20);
-    a.agregar(50);
-    a.agregar(100);*/
-    cout << endl << "VOY A SACAR" << endl;
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
-    a.sacar();
+    a.pintar();
+    cout << "----------------------------------------------" << endl << endl;
+
+   cout << "SE METE EL NODO: 10" << ": " <<endl;
+    a.agregar(10);
+    a.pintar();
+    cout << "----------------------------------------------" << endl << endl;
+
+    cout << "SE METE EL NODO: 100" << ": " <<endl;
+    a.agregar(100);
+    a.pintar();
+    cout << "----------------------------------------------" << endl;
+    cout << "----------------------------------------------" << endl << endl;
+
+    cout << "A continuación, borro todos los nodos y dejo el último: " << endl;
+    for(int i = 0 ; i < 21 ; i++){
+        cout << "SE BORRO EL NODO: " << a.sacar() << endl;
+    }
+    a.agregar(4);
+    a.agregar(20);
+    a.agregar(0);
     a.pintar();
 
-    cout << "------------------------------------------------------------------------" << endl;
+
 }

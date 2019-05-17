@@ -419,34 +419,80 @@ monton::~monton(){
 //-----------------------------------------------------------------------------------------------------------------------------------
 void monton::bajar(nodo *p){
 
-    while( ( (p->hizq != NULL) && p->valor > p->hizq->valor) || ( (p->hder != NULL) && p->valor > p->hder->valor) ){
-        if( (p->hizq->valor) < (p->hder->valor) ){
-            intercambiar(p, p->hizq);
+    nodo *q;
+    //VAS A BAJAR MIENTRAS TENGAS HIJOS, SI NO TIENE, ENTONCES NO TENDRÁ NODO CON EL CUÁL INTERCAMBIARSE
+    while(p->hizq != NULL || p->hder != NULL){
+
+        if (p->hder != NULL && p->hizq == NULL) q = p->hder; //Si el hijo derecho existe y el izquierdo no, entonces se toma el hijo derecho.
+        else if(p->hder == NULL && p->hizq != NULL) q = p->hizq; //Si el hijo derecho no existe y el izquierdo sí, entonces se toma el hijo izquierdo.
+        else{  //CASO EN EL QUE LOS DOS HIJOS EXISTEN
+
+            if(p->hder->valor < p->hizq->valor) q = p->hder; //Si el hder es menor al hizq, entonces se toma como candidato al hder.
+            else q = p->hizq; //Si el hizq es menor al hder, entonces se toma como candidato al hizq.
+
         }
-        else{
-            intercambiar(p,p->hder);
-        }
+        //AHORA SE DECIDE SI SE BAJA EL NODO O NO
+        if(p->valor < q->valor) return; //Si el valor de p ya es menor que el candidato, entonces significa que ya está todo acomodado y se acaba el proceso.
+        else intercambiar(p, q); //Si el valor de p sigue siendo mayor que el candidato (q), entonces se intercambia.
+
     }
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 int monton::sacar(){
 
+    nodo *p;
     int valor;
-    valor = raiz->valor;
-    intercambiar(raiz, fin);
-    //BORRAR EL ÚLTIMO ELEMENTO QUE AHORA ES EL MÁS CHICO DE TODOS
-    //Desconectas el 'fin' del árbol
-    if(fin->padre->hizq == fin) fin->padre->hizq = NULL;
-    else fin->padre->hder = NULL;
 
-    //Desconectas el 'fin' de la lista y lo eliminas
-    fin = fin->anterior;
-    delete(fin->siguiente);
-    fin->siguiente = NULL;
+    //CASO CUANDO EL MONTÓN ESTÁ VACÍO, ENTONCES SE REGRESA UN VALOR 'VACIO'
+    if(raiz == NULL) return(999);
 
-    bajar(raiz);
-    return(valor);
+    //CASO CUANDO EL MONTÓN ÚNICAMENTE CUENTA CON UN ELEMENTO
+    if(principio == fin){
+
+        p = principio; //te pones en el principio
+        valor = p->valor; //Guardas el valor del nodo
+
+        raiz = donde = NULL; //Desconectas del árbol
+
+        principio = fin = NULL; //Desconectas de la lista doble
+
+        delete(p); //Eliminas el nodo
+        return(valor); //Regresas el valor del nodo.
+
+    }
+    else{ //CASO CUANDO EL MONTÓN TIENE MÁS DE UN ELEMENTO.
+
+        valor = raiz->valor; //Como se saca de la raíz, entonces guardas el valor de ésta para regresarlo cuando todo el proceso acabe.
+        intercambiar(principio, fin); //Intercambias el principio por el fin.
+        p = fin; //Te pones en el fin para borrarlo
+
+        //DESCONECTAS A P (fin) DEL ÁRBOL
+
+        //Haces NULL el lado del padre en el que p está conectado y reajustas las variables 'como' y 'donde'
+        if(p->padre->hizq == p){
+            p->padre->hizq = NULL;
+            como = HIZQ;
+            donde = p->padre;
+        }
+        else{
+            p->padre->hder = NULL;
+            como = HDER;
+            donde = p->padre;
+        }
+
+        //DESCONECTAS A P (fin) DE LA LISTA DOBLE
+        //Conviertes al penúltimo en el 'fin'
+        p->anterior->siguiente = NULL;
+        fin = p->anterior;
+
+        delete(p); //Borras el nodo
+
+        //COMIENZAS A BAJAR LA RAÍZ (principio) PARA AJUSTAR EL MONTÓN
+        p = principio; //Te pones en el principio / raiz
+        bajar(p); //Bajas este nodo hasta donde corresponda
+        return(valor); //Regresas el valor que tenía el nodo que sacaste.
+    }
 
 }
 #endif // MONTON_H_INCLUDED
