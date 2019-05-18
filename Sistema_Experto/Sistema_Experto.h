@@ -1,3 +1,10 @@
+/*
+    Nombre: Sitema_Experto.h
+    Autor: Pedro Andrés Hernández Amador.
+    Fecha: mayo del 2019
+
+    Descripción: Archivo de cabecera que incluye las funciones para implementar un sistema experto.
+*/
 #ifndef SISTEMA_EXPERTO_H_INCLUDED
 #define SISTEMA_EXPERTO_H_INCLUDED
 
@@ -9,6 +16,13 @@ using namespace::std;
 
 struct caja2;
 
+/*
+    Esta estructura representa a un nodo saliente de una pregunta/cláusula en el sistema experto.
+    numNodo: Valor del nodo.
+    camviaValor: señala si se le debe mandar un valor de verdad contrario al nodo saliente.
+    *siguiente: Apuntador hacia el siguiente saliente del nodo original.
+    *direccionNodo: Dirección de la pregunta/cláusula al cuál hace referencia este saliente
+*/
 struct caja1{
     int numNodo;
     caja2 *direccionNodo;
@@ -17,6 +31,31 @@ struct caja1{
 };
 /**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta clase representa a todos los salientes de alguna pregunta/cláusula en el sistema experto.
+    Es una lista de struct caja1 ordenada por numNodo sin repetición.
+
+    ATRIBUTOS
+    *principio: Apuntador hacia el primer elemento de la lista.
+    *anterior: Apuntador hacia el elemento anterior del cuál nos encontramos.
+    *lugarAgregado: Apuntador hacia la dirección en donde agregamos ó encontramos un nodo saliente.
+    encontrado: Variable que nos indica si algún nodo existe dentro de la lista.
+    donde: Variable que nos indica en dónde debe agregarse un nodo en la lista.
+
+    //FUNCIONES
+    lista_arcos(): constructor de la clase.
+    ~lista_arcos(): destructor de la clase.
+    buscar(int a): función que busca un nodo en la lista.
+    agregar(int a): agrega un nodo en la lista.
+    pinitar(): imprime la lista ordenada (a los salientes de un nodo).
+    int cuantos(): regresa el número de salientes que tiene una pregunta/clausula
+    *lugar_agregado(): regresa la dirección en donde fue agregado ó encontrado un nodo
+    *principio(): regresa la dirección del primer nodo en la lista
+    iniciar(): copia del constructor
+    terminar(): copia del destructor
+
+
+*/
 class lista_arcos{
     caja1 *principio, *anterior, *lugarAgregado;
     int encontrado, donde;
@@ -38,7 +77,22 @@ public:
     caja1 *lugar_agregado();
     caja1 *Principio();
 };
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta estructura representa a una pregunta/cláusula en el sistema experto. Es una lista ordenada por numNodo sin repetición.
+
+    ATRIBUTOS:
+    numNodo: número del nodo.
+    bandera: Bandera que indica si el nodo es pregunta ó conclusion
+    cuantos: cuenta la cantidad de valores de verdad que han llegado al nodo.
+    totales: cantidad de valores de verdad que se necesitan para que este nodo tome un valor de verdad definitivo
+    conectivo: conectivo logico del nodo 1 = Y ; 2 = O
+    valorVerdad: valor de verdad definitivo del nodo.
+    *siguiente: nodo siguiente a éste en la lista de preguntas/conclusiones del sistema experto.
+    salientes: lista de salientes de este nodo.
+
+*/
 struct caja2{
     int numNodo;
     int bandera;
@@ -49,24 +103,32 @@ struct caja2{
     caja2 *siguiente;
     lista_arcos salientes;
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función es el constructor de la clase lista_arcos
+*/
 lista_arcos::lista_arcos(){
     principio = anterior = lugarAgregado = NULL;
     encontrado = NO;
     donde = VACIO;
     cuantos = 0;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
-
+/**************************************************************************************************************************************************************************************************/
+/*
+    Esta función es una copia del constructor de la clase lista_arcos
+*/
 void lista_arcos::iniciar(){
     principio = anterior = lugarAgregado = NULL;
     encontrado = NO;
     donde = VACIO;
     cuantos = 0;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Destructor de la clase lista_arcos
+*/
 lista_arcos::~lista_arcos(){
     caja1 *p;
     while(principio){
@@ -80,8 +142,11 @@ lista_arcos::~lista_arcos(){
     cuantos = 0;
     return;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Copia del destructor de la clase lista_arcos
+*/
 void lista_arcos::terminar(){
     caja1 *p;
     while(principio){
@@ -95,8 +160,11 @@ void lista_arcos::terminar(){
     cuantos = 0;
     return;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función cuenta cuántos salientes tiene una pregunta/clausula. Regrsa dicho resultado.
+*/
 int lista_arcos::Cuantos(){
     caja1 *p;
     p = principio;
@@ -107,7 +175,14 @@ int lista_arcos::Cuantos(){
     }
     return(cuantos);
 }
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función busca un nodo dentro de la lista de salientes de algún nodo.
+
+    PARÁMETROS
+    a: Número del nodo que queremos buscar
+*/
 void lista_arcos::buscar(int a){
     caja1 *p; //Puntero tipo caja que recorrerá la estructura.
 
@@ -168,7 +243,15 @@ void lista_arcos::buscar(int a){
     donde = FINAL;
     return;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
+
+/*
+    Esta función agrega un nodo en la lista de salientes de una pregunta/clausula
+
+    PARÁMETROS:
+    nodo: Número del nodo que queremos agregar.
+    cambiaValor: tipo de cambiaValor que queremos que el saliente tenga.
+*/
 int lista_arcos::agregar(int nodo, int cambiaValor){
     caja1 *p; //Puntero tipo caja que nos servirá para agregar el valor a la estructura.
     buscar(nodo); //Se busca el número que queremos introducir.
@@ -218,18 +301,27 @@ int lista_arcos::agregar(int nodo, int cambiaValor){
     }
     return (1); //Se regresa un 1 porque el valor pudo ser agregado.
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función regresa la dirección en donde fue encontrado ó agregado un nodo saliente/entrante.
+*/
 caja1* lista_arcos::lugar_agregado(){
     return(lugarAgregado);
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función regresa la dirección del primer elemento de la lista de salientes/entrantes.
+*/
 caja1 *lista_arcos::Principio(){
     return (principio);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
+/*
+    Esta función imprime en pantalla todos los elementos de la lista (entrantes / salientes de algún nodo).
+*/
 void lista_arcos::pintar(){
     caja1 *p; p = principio; //Se crea un puntero tipo caja y se sitúa al principio de la lista ordenada.
     while(p){ //Se imprimen todos los valores que forman parte de la estructura.
@@ -240,11 +332,28 @@ void lista_arcos::pintar(){
 }
 /**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta clase representa a todas las preguntas, conclusiones y cláusulas del sistema experto.
+    Es una lista de struct caja2 ordenada por numNodo sin repetición.
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+    ATRIBUTOS
+    *principio: Apuntador hacia el primer elemento de la lista.
+    *anterior: Apuntador hacia el elemento anterior del cuál nos encontramos.
+    *lugarAgregado: Apuntador hacia la dirección en donde agregamos ó encontramos un nodo.
+    encontrado: Variable que nos indica si algún nodo existe dentro de la lista.
+    donde: Variable que nos indica en dónde debe agregarse un nodo en la lista.
 
-/**************************************************************************************************************************************************************************************************/
+    //FUNCIONES
+    lista_nodoss(): constructor de la clase.
+    ~lista_nodos(): destructor de la clase.
+    buscar(int a): función que busca un nodo en la lista.
+    agregar(int nodo[7]): agrega un nodo en la lista.
+    pinitar(): imprime la lista ordenada (a los salientes de un nodo).
+    iniciar(): copia del constructor
+    terminar(): copia del destructor
+    *lugar_agregado(): regresa la dirección en donde fue agregado ó encontrado un nodo
 
+*/
 class lista_nodos{
     caja2 *principio, *anterior, *lugarAgregado;
     int encontrado, donde;
@@ -261,23 +370,32 @@ public:
     void terminar();
     caja2* lugar_agregado();
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Constructor de la clase lista_nodos
+*/
 lista_nodos::lista_nodos(){
     principio = anterior = lugarAgregado = NULL;
     encontrado = NO;
     donde = VACIO;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función es una copia del constructor de la clase lista_nodos
+*/
 void lista_nodos::iniciar(){
     principio = anterior = lugarAgregado = NULL;
     encontrado = NO;
     donde = VACIO;
 
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Copia del destructor de la clase lista_nodos
+*/
 void lista_nodos::terminar(){
     caja2 *p;
     while(principio){
@@ -291,8 +409,11 @@ void lista_nodos::terminar(){
     donde = VACIO;
     return;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Destructor de la clase lista_nodos
+*/
 lista_nodos::~lista_nodos(){
     caja2 *p;
     while(principio){
@@ -306,8 +427,14 @@ lista_nodos::~lista_nodos(){
     donde = VACIO;
     return;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función busca un nodo dentro de la lista de nodos.
+
+    PARÁMETROS
+    a: Número del nodo que queremos buscar
+*/
 void lista_nodos::buscar(int a){
     caja2 *p; //Puntero tipo caja que recorrerá la estructura.
 
@@ -368,8 +495,14 @@ void lista_nodos::buscar(int a){
     donde = FINAL;
     return;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función agrega un nodo dentro de la lista de nodos.
+
+    PARÁMETROS
+    nodo[7]: arreglo con todos los elementos que debe contener un nodo (bandera, cuantos, conectivo,...) incluyendo un saliente.
+*/
 int lista_nodos::agregar(int nodo[7]){
     caja2 *p; //Puntero tipo caja que nos servirá para agregar el valor a la estructura.
     buscar( nodo[0] ); //Se busca el número que queremos introducir.
@@ -425,8 +558,12 @@ int lista_nodos::agregar(int nodo[7]){
     }
     return (1); //Se regresa un 1 porque el valor pudo ser agregado.
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función imprime en pantalla todos los elementos de la lista de nodos de la gráfica con sus salientes
+    y entrantes.
+*/
 void lista_nodos::pintar(){
 
     caja2 *p; p = principio; //Se crea un puntero tipo caja y se sitúa al principio de la lista ordenada.
@@ -440,18 +577,34 @@ void lista_nodos::pintar(){
     }
 
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función regresa la dirección en donde un nodo  fue agregado ó encontrado.
+*/
 caja2* lista_nodos::lugar_agregado(){
     return(lugarAgregado);
 }
 /**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta estructura representa a un nodo que ya adquirió valor de verdad dentro de la pila auxiliar que nos ayuda a recibir este tipo de nodos
+    para exparcir su valor de verdad hacia sus correspondientes salientes.
+
+    ATRIBUTOS:
+    *direccion: direccion del nodo pero dentro de la lista de nodos.
+    *siguiente: Apuntador hacia el siguiente elemento de la pila.
+*/
 struct caja3{
     caja2 *direccion;
     caja3 *siguiente;
 };
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta clase es una pila auxiliar del sistema experto. En ésta introduciremos todos los nodos que vayan adquiriendo valor de verdad para
+    posteriormente desparramar dicho valor de verdad hacia todos los salientes de el nodo que estamos procesando dentro de la pila.
+*/
 class pila{
     //ATRIBUTOS
     private:
@@ -466,7 +619,7 @@ class pila{
         caja2 * Sacar(); //Método para sacar elementos de la pila.
         void Pintar(); //Método para imprimir la pila.
 };
-//----------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
 
 /*
     Este método es el constructor de la clase pila. Inicializa el puntero 'principio' como NULL porque no
@@ -478,7 +631,7 @@ pila::pila(){
 void pila::iniciar(){
     principio = NULL;
 }
-//----------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
 /*
     Esta función agrega el número 'a' a la pila.
 */
@@ -507,7 +660,7 @@ void pila::Agregar(caja2 *saliente){
     }
     return;
 }
-//----------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
 
 //Esta función se encarga de sacar el último elemento de la pila, muestra su valor y libera la memoria ocupada por éste.
 caja2 * pila::Sacar(){
@@ -530,7 +683,7 @@ caja2 * pila::Sacar(){
     delete p; //Se libera la memoria ocupada por el dato en cuestión.
     return (direccion); //Se regresa eel valor que el dato extraído tenía.
 }
-//----------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
 /*
 Esta función imprime en pantalla los datos que están en la pila.
 */
@@ -543,7 +696,7 @@ void pila::Pintar(){
     }
     std::cout << "\b\b ";
 }
-//----------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
 /*
 El destructor de la pila libera la memoria que ocupan los datos que están en la estructura
 y reinician los atributos de la pila.
@@ -564,7 +717,11 @@ pila:: ~pila(){
     principio = NULL;
     return;
 }
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Copia del destructor de la clase pila
+*/
 void pila::terminar(){
     caja3 *p;//Puntero a caja
     /*
@@ -582,6 +739,22 @@ void pila::terminar(){
     return;
 }
 /****************************************************************************************************************************************************/
+
+/*
+    Esta clase representa a un sistema experto.
+
+    ATRIBUTOS
+    A: lista de preguntas, respuestas, cláusulas.
+    B: Pila auxiliar en donde se introducen todos los nodos que han adquirido valor de verdad
+    solucion: solucion del sistema experto.
+
+    FUNCIONES
+    SE: constructor
+    ~SE: destructor
+    agregar_arcp(int nodo[7], int nodo2[7]): agrega al nodo1 a la lista de nodos y al nodo2 como saliente del nodo1
+    pintar: pinta la lista de nodos.
+    correr(string preguntas[40]): corre el sistema experto.
+*/
 class SE{
     lista_nodos A;
     pila B;
@@ -594,21 +767,34 @@ public:
     void pintar();
     void correr(string preguntas[40]);
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+/**************************************************************************************************************************************************************************************************/
+/*
+    Constructor de la clase SE
+*/
 SE::SE(){
     A.iniciar();
     B.iniciar();
     solucion = 0;
 }
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Destructor de la clase SE
+*/
 SE::~SE(){
     A.terminar();
     B.terminar();
     solucion = 0;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función agrega un nodo y a un saliente al sistema experto
+
+    PARAMETROS
+    nodo1[7]: banderas del primer nodo y un saliente
+    nodo2[7]: banderas del segundo nodo que será saliente del 1
+*/
 void SE::agregar_arco(int nodo1[7], int nodo2[7]){
     caja1 *p;
     caja2 *q, *q2;
@@ -622,12 +808,21 @@ void SE::agregar_arco(int nodo1[7], int nodo2[7]){
     (p -> direccionNodo) = q;
 
 }
-
+/**************************************************************************************************************************************************************************************************/
+/*
+    Esta función pinta la lista de nodos del sistema experto.
+*/
 void SE::pintar(){
     A.pintar();
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/**************************************************************************************************************************************************************************************************/
 
+/*
+    Esta función corre el sistema experto.
+
+    PARÁMETROS
+    preguntas[40]: recibe la lista de preguntas/conclusiones/clausulas con el cuál el sistema experto trabaja.
+*/
 void SE::correr(string preguntas[40]){
  caja2 *dir; //Puntero que almacenará la dirección del nodo pregunta en el que estamos
  caja1 *saliente, *salientePila; //Punteros que recorrerán los salientes de los nodos pregunta y los nodos de la pila.

@@ -1,4 +1,10 @@
+/*
+    Nombre: Sitema_Experto.h
+    Autor: Pedro Andrés Hernández Amador.
+    Fecha: mayo del 2019
 
+    Descripción: Archivo de implementación de un sistema experto que adivina 7 animales.
+*/
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
@@ -10,6 +16,10 @@ using namespace::std;
 
 int main(){
 
+    cout << "ESTE PROGRAMA ES UN SISTEMA EXPERTO" << endl << endl;
+    cout << "PUEDE ADIVINAR 7 ANIMALES: (ONZA, TIGRE, JIRAFA, ZEBRA, AVESTRUZ, PINGUINO, ALBATROZ)" << endl;
+    cout << "RESPONDE A LAS PREGUNTAS CON: " << endl;
+    cout << "1: Si" << endl << "0: No" << endl << "2: No se" << endl << endl;
     SE a;
 
     int nodo[14];
