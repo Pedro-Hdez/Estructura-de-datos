@@ -1,3 +1,13 @@
+/*
+    Nombre: ArbolesBin.h
+    Autor: Pedro Andrés Hernández Amador.
+    Fecha: mayo del 2019
+
+    Descripción: Archivo de cabecera que incluye las funciones, clases y estructuras que gestionan el funcionamiento
+                 de un árbol binario de búsqueda.
+*/
+
+
 #ifndef ARBOLESBIN_H_INCLUDED
 #define ARBOLESBIN_H_INCLUDED
 
@@ -5,14 +15,42 @@
 #include <string>
 #include <sstream>
 using namespace std;
-//ptueb
 
+/*
+    Esta estructura representa un nodo del árbol.
+
+    ATRIBUTOS
+    los punteros: padre, hder, hizq son para conectar los nodos en el árbol
+    los punteros: anterior, siguiente son para conectar los nodos en la lista doble
+    la variable valor es la que almacena el valor del nodo.
+*/
 struct nodo{
     nodo *padre, *hder, *hizq, *anterior, *siguiente;
     int valor;
 };
 /***************************************************************************************************************************************************/
+/*
+    Esta clase representa a un árbol de búsqueda binario
 
+    ATRIBUTOS:
+    donde: Padre del nodo que se encontró ó nodo en donde se agregará/borrará un hijo.
+    raiz: raiz del árbol
+    principio: principio de la lista ordenada. Coincide con la raiz.
+    fin: último elemento de la lista ordenada.
+    encontrado: indica si algún nodo buscado se encontró en el árbol
+    como: indica cómo se encontró colgado un nodo en el árbol o si es la raiz de éste.
+
+    FUNCIONES:
+    arbol(): constructor
+    ~arbol(): destructor
+    buscar(int a): busca un nodo en el árbol
+    agregar(int a): agrega un nodo al árbol (no se admiten repeticiones)
+    pintar(): imprime en pantalla el árbol
+    borrar(): se usa para gestionar el borrado de un nodo
+    borrar1(nodo *p1): borra un nodo sin hijos o con un sólo hijo
+    intercambiar(nodo *p, nodo *q): intercambia dos nodos del árbol
+    intercambiarVecinos(nodo *p1, nodo *q1): intercambia los punteros (vecinos) de dos nodos en el árbol
+*/
 class arbol{
     nodo *donde, *raiz, *principio, *fin;
     int encontrado, como;
@@ -28,18 +66,25 @@ public:
     int borrar(int a);
     void borrar1(nodo *p1);
     void intercambiar(nodo *p, nodo *q);
+    void intercambiarVecinos(nodo *p1, nodo *q1);
 
 };
-//------------------------------------------------------------------------------------------------------------------------------------//
+/***************************************************************************************************************************************************/
 
+/*
+    Esta función es el constructor de la clase arbol.
+*/
 arbol::arbol(){
     donde = raiz = principio = fin = NULL;
     encontrado = NO;
     donde = NULL;
     como = RAIZ;
 }
-//------------------------------------------------------------------------------------------------------------------------------------//
+/***************************************************************************************************************************************************/
 
+/*
+    Esta función es el destructor de la clase arbol.
+*/
 arbol::~arbol(){
     nodo *p;
     while(principio){
@@ -53,7 +98,14 @@ arbol::~arbol(){
     como = RAIZ;
     return;
 }
-//------------------------------------------------------------------------------------------------------------------------------------//
+/***************************************************************************************************************************************************/
+
+/*
+    Esta función busca un número dentro del árbol.
+
+    PARÁMETROS
+    a: el número a buscar dentro del nodo.
+*/
 
 void arbol::buscar(int a){
     nodo *p;
@@ -112,8 +164,16 @@ void arbol::buscar(int a){
         }
     }
 }
-//------------------------------------------------------------------------------------------------------------------------------------//
+/***************************************************************************************************************************************************/
 
+/*
+    Esta función agrega un número al árbol.
+
+    PARÁMETROS
+    a: el número a agregar.
+
+    Regresa un 1 si se pudo agregar el número; en caso contario, regresa un 0.
+*/
 int arbol::agregar(int a){
     nodo *p;
     buscar(a);
@@ -169,8 +229,11 @@ int arbol::agregar(int a){
     }
     return(1);
 }
-//------------------------------------------------------------------------------------------------------------------------------------//
+/***************************************************************************************************************************************************/
 
+/*
+    Esta función imprime en pantalla la información del árbol
+*/
 void arbol::pintar(){
     std::string padre = "";
     std::string hizq = "";
@@ -223,48 +286,28 @@ void arbol::pintar(){
         p = p->siguiente;
     }
 }
-//-------------------------------------------------------------------------------------------------------------------------------------------
+/***************************************************************************************************************************************************/
 
+/*
+    Esta función intercambia dos nodos dentro del árbol.
+
+    PARÁMETROS
+    p: la dirección del primer nodo
+    q: la dirección del segundo nodo
+*/
 void arbol::intercambiar(nodo *p, nodo *q){
     nodo *r;
 
     //Caso en el que q está arriba
     if(p->padre == q){ //Caso en el que q está arriba
         if(q->hder == p){ //p cuelga como hijo derecho
-            //Intercambias los padres
-            r = p->padre;
-            p->padre = q->padre;
-            q->padre = r;
-
-            //Intercambias los hijos derechos
-            r = p->hder;
-            p->hder = q->hder;
-            q->hder = r;
-
-            //Intercambias los hijos izquierdos
-            r = p->hizq;
-            p->hizq = q->hizq;
-            q->hizq = r;
+            intercambiarVecinos(p, q);
 
             p->hder = q;
             q->padre = p;
-/*********************************************************************************************************/
         }
         else{ //p cuelga como hijo izquierdo
-            //Intercambias los padres
-            r = p->padre;
-            p->padre = q->padre;
-            q->padre = r;
-
-            //Intercambias los hijos derechos
-            r = p->hder;
-            p->hder = q->hder;
-            q->hder = r;
-
-            //Intercambias los hijos izquierdos
-            r = p->hizq;
-            p->hizq = q->hizq;
-            q->hizq = r;
+            intercambiarVecinos(p, q);
 
             p->hizq = q;
             q->padre = p;
@@ -286,39 +329,14 @@ void arbol::intercambiar(nodo *p, nodo *q){
     //Caso en el que p está arriba
     else if(q->padre == p){
         if(p->hder == q){ //q cuelga como hijo derecho
-            //Intercambias los padres
-            r = p->padre;
-            p->padre = q->padre;
-            q->padre = r;
+            intercambiarVecinos(p, q);
 
-            //Intercambias los hijos derechos
-            r = p->hder;
-            p->hder = q->hder;
-            q->hder = r;
-
-            //Intercambias los hijos izquierdos
-            r = p->hizq;
-            p->hizq = q->hizq;
-            q->hizq = r;
             //Arreglas a mano los punteros en conflicto
             q->hder = p;
             p->padre = q;
         }
         else{ //q cuelga como hijo izquierdo
-            //Intercambias los padres
-            r = p->padre;
-            p->padre = q->padre;
-            q->padre = r;
-
-            //Intercambias los hijos derechos
-            r = p->hder;
-            p->hder = q->hder;
-            q->hder = r;
-
-            //Intercambias los hijos izquierdos
-            r = p->hizq;
-            p->hizq = q->hizq;
-            q->hizq = r;
+            intercambiarVecinos(p, q);
 
             q->hizq = p;
             p->padre = q;
@@ -338,20 +356,8 @@ void arbol::intercambiar(nodo *p, nodo *q){
     }
     //CASO GENERAL
     else{
-        //Intercambias los padres
-        r = p->padre;
-        p->padre = q->padre;
-        q->padre = r;
 
-        //Intercambias los hijos derechos
-        r = p->hder;
-        p->hder = q->hder;
-        q->hder = r;
-
-        //Intercambias los hijos izquierdos
-        r = p->hizq;
-        p->hizq = q->hizq;
-        q->hizq = r;
+        intercambiarVecinos(p, q);
 
         //Se conectan los padres
         if(q->padre == NULL) raiz = q;
@@ -369,19 +375,6 @@ void arbol::intercambiar(nodo *p, nodo *q){
 
     //SE ARREGLAN LOS VECINOS
 
-    //Se conectan los padres
-  /*  if(q->padre == NULL) raiz = q;
-    else{
-        if(q->padre->hder == p) q->padre->hder = q;
-        else q->padre->hizq = q;
-    }
-
-    if(p->padre == NULL) raiz = p;
-    else{
-        if(p->padre->hder == q) p->padre->hder = p;
-        else p->padre->hizq = p;
-    }*/
-
     //Se conectan los hijoz.
     if(q -> hizq != NULL) q->hizq->padre = q;
     if(q->hder != NULL) q->hder->padre = q;
@@ -389,7 +382,16 @@ void arbol::intercambiar(nodo *p, nodo *q){
     if(p->hizq != NULL) p->hizq ->padre = p;
     if(p->hder != NULL) p->hder->padre = p;
 }
+/*********************************************************************************************************/
 
+/*
+    Esta función borra un nodo del árbol
+
+    PARÁMETROS
+    a: el número del nodo a borrar
+
+    Regresa un 1 si se pudo borrar el número; en caso contrario, regresa un 0.
+*/
 int arbol::borrar(int a){
     nodo *p;
     buscar(a);
@@ -432,7 +434,14 @@ int arbol::borrar(int a){
     borrar1(p);
     return(1);
 }
+/*********************************************************************************************************/
 
+/*
+    Esta función borra un nodo que tiene 0 o 1 hijo.
+
+    PARÁMETROS
+    p1: la dirección del nodo a borrar
+*/
 void arbol::borrar1(nodo *p1){
     nodo *p = p1;
 
@@ -505,5 +514,33 @@ void arbol::borrar1(nodo *p1){
 
     //Se borra el nodo
     delete p;
+}
+/*********************************************************************************************************/
+
+/*
+    Esta función intercambia los vecinos del árbol (padres e hijos) entre dos nodos
+
+    PARÁMETROS:
+    p1: la dirección del primer nodo
+    q1: la dirección del segundo nodo
+*/
+void arbol::intercambiarVecinos(nodo *p1, nodo *q1){
+    nodo *p, *q, *r; //Copias
+    p = p1; q = q1;
+
+    //Intercambias los padres
+    r = p->padre;
+    p->padre = q->padre;
+    q->padre = r;
+
+    //Intercambias los hijos derechos
+    r = p->hder;
+    p->hder = q->hder;
+    q->hder = r;
+
+    //Intercambias los hijos izquierdos
+    r = p->hizq;
+    p->hizq = q->hizq;
+    q->hizq = r;
 }
 #endif // ARBOLESBIN_H_INCLUDED

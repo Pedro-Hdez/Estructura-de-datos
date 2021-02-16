@@ -22,12 +22,13 @@ int main(){
     cout << "1: Si" << endl << "0: No" << endl << "2: No se" << endl << endl;
     SE a;
 
-    int nodo[14];
-    int nodo1[7], nodo2[7];
-    string preguntas_conclusiones[40];
+    int nodo[14]; //Arreglo para extraer la información de un arco
+    int nodo1[7], nodo2[7]; //Arreglos para dividir la información de un arco en dos nodos.
+    string preguntas_conclusiones[40]; //Arreglo de preguntas/conclusiones/clausulas
     ifstream sist;
 
 
+    //SE LEE EL ARCHIVO DE NODOS
     int componente;
     sist.open("nodos.txt");
     if (!sist){
@@ -36,6 +37,7 @@ int main(){
         return 1;
     }
 
+    //Se lee la info de un arco
     int i = 0;
     string texto;
     while(sist){
@@ -47,18 +49,19 @@ int main(){
             i++;
 
         }
-        else{
+        else{ //La info del arco se divide en dos nodos
             for(int k = 0 ; k < 6 ; k++){
                 nodo1[k] = nodo[k];
             }
             for(int k = 6 ; k < 13 ; k++){
                 nodo2[k-6] = nodo[k];
             }
-            a.agregar_arco(nodo1, nodo2);
+            a.agregar_arco(nodo1, nodo2); //Se agrega el arco entre los dos nodos
             i = 0;
         }
     }
 
+    //SE LEE EL ARCHIVO DE PREGUNTAS (TEXTOS)
     ifstream sist2;
     sist2.open("preguntas.txt");
     if (!sist2){
@@ -67,11 +70,13 @@ int main(){
         return 1;
     }
 
+    //SE EXTRAE LA INFO DE LOS TEXTOS
     i = 1;
     while(sist2){
         sist2 >> preguntas_conclusiones[i];
         i++;
     }
+    //CORRES EL SISTEMA EXPERTO CON LOS TEXTOS LEÍDOS
     a.correr(preguntas_conclusiones);
 
     return 0;
